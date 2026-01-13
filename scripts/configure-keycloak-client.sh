@@ -82,10 +82,9 @@ echo ""
 
 # Define the URIs we want to add
 # - localhost for local development
-# - *.replit.dev for Replit deployments  
-# - *.repl.co for older Replit URLs
-NEW_REDIRECT_URIS='["http://localhost:5173/*", "https://*.replit.dev/*", "https://*.repl.co/*"]'
-NEW_WEB_ORIGINS='["http://localhost:5173", "https://*.replit.dev", "https://*.repl.co"]'
+# - Various Replit URL patterns (they use different subdomains)
+NEW_REDIRECT_URIS='["http://localhost:5173/*", "https://*.replit.dev/*", "https://*.worf.replit.dev/*", "https://*.picard.replit.dev/*", "https://*.kirk.replit.dev/*", "https://*.repl.co/*"]'
+NEW_WEB_ORIGINS='["http://localhost:5173", "https://*.replit.dev", "https://*.worf.replit.dev", "https://*.picard.replit.dev", "https://*.kirk.replit.dev", "https://*.repl.co"]'
 
 # Merge with existing (remove duplicates)
 MERGED_REDIRECTS=$(echo "$CURRENT_REDIRECTS $NEW_REDIRECT_URIS" | jq -s 'add | unique')
