@@ -86,30 +86,55 @@ echo ""
 NEW_REDIRECT_URIS='["http://localhost:5173/*", "https://*.replit.dev/*", "https://*.worf.replit.dev/*", "https://*.picard.replit.dev/*", "https://*.kirk.replit.dev/*", "https://*.repl.co/*"]'
 NEW_WEB_ORIGINS='["http://localhost:5173", "https://*.replit.dev", "https://*.worf.replit.dev", "https://*.picard.replit.dev", "https://*.kirk.replit.dev", "https://*.repl.co"]'
 
-# Auto-detect Replit URL if running on Replit
-if [ -n "$REPL_SLUG" ] && [ -n "$REPL_OWNER" ]; then
-    # Try to detect the current Replit URL
-    REPLIT_HOSTNAME="${REPL_SLUG}.${REPL_OWNER}.repl.co"
-    echo "🔍 Detected Replit hostname: $REPLIT_HOSTNAME"
-    NEW_REDIRECT_URIS=$(echo "$NEW_REDIRECT_URIS" | jq --arg url "https://${REPLIT_HOSTNAME}/*" '. += [$url]')
-    NEW_WEB_ORIGINS=$(echo "$NEW_WEB_ORIGINS" | jq --arg url "https://${REPLIT_HOSTNAME}" '. += [$url]')
-fi
+# Auto-detect Replit URL using available environment variables
+DETECTED_REPLIT_HOST=""
 
-# Also check for REPLIT_DEV_DOMAIN (newer Replit deployments)
+# Method 1: REPLIT_DEV_DOMAIN (set by Replit for dev URLs)
 if [ -n "$REPLIT_DEV_DOMAIN" ]; then
-    echo "🔍 Detected Replit dev domain: $REPLIT_DEV_DOMAIN"
-    NEW_REDIRECT_URIS=$(echo "$NEW_REDIRECT_URIS" | jq --arg url "https://${REPLIT_DEV_DOMAIN}/*" '. += [$url]')
-    NEW_WEB_ORIGINS=$(echo "$NEW_WEB_ORIGINS" | jq --arg url "https://${REPLIT_DEV_DOMAIN}" '. += [$url]')
+    DETECTED_REPLIT_HOST="$REPLIT_DEV_DOMAIN"
+    echo "🔍 Detected via REPLIT_DEV_DOMAIN: $DETECTED_REPLIT_HOST"
 fi
 
-# Allow user to specify additional URL via environment variable
-if [ -n "$REPLIT_URL" ]; then
-    echo "🔍 Using custom REPLIT_URL: $REPLIT_URL"
-    # Strip protocol and trailing slash if present
-    REPLIT_HOST=$(echo "$REPLIT_URL" | sed 's|https://||' | sed 's|http://||' | sed 's|/$||')
-    NEW_REDIRECT_URIS=$(echo "$NEW_REDIRECT_URIS" | jq --arg url "https://${REPLIT_HOST}/*" '. += [$url]')
-    NEW_WEB_ORIGINS=$(echo "$NEW_WEB_ORIGINS" | jq --arg url "https://${REPLIT_HOST}" '. += [$url]')
+# Method 2: Construct from REPL_ID (Replit's unique ID)
+if [ -z "$DETECTED_REPLIT_HOST" ] && [ -n "$REPL_ID" ]; then
+    # Try common Replit URL patterns
+    # Format: <repl-id>-00-<random>.worf.replit.dev or similar
+    # We'll add a wildcard pattern for this repl
+    echo "🔍 Detected REPL_ID: $REPL_ID"
+    # Add patterns that include this REPL_ID
+    NEW_REDIRECT_URIS=$(echo "$NEW_REDIRECT_URIS" | jq --arg url "https://${REPL_ID}*.replit.dev/*" '. += [$url]')
+    NEW_REDIRECT_URIS=$(echo "$NEW_REDIRECT_URIS" | jq --arg url "https://${REPL_ID}*.worf.replit.dev/*" '. += [$url]')
 fi
+
+# Method 3: REPL_SLUG + REPL_OWNER (older format)
+if [ -z "$DETECTED_REPLIT_HOST" ] && [ -n "$REPL_SLUG" ] && [ -n "$REPL_OWNER" ]; then
+    DETECTED_REPLIT_HOST="${REPL_SLUG}.${REPL_OWNER}.repl.co"
+    echo "🔍 Detected via REPL_SLUG/OWNER: $DETECTED_REPLIT_HOST"
+fi
+
+# Method 4: Check REPLIT_DOMAINS (might be set in some environments)
+if [ -z "$DETECTED_REPLIT_HOST" ] && [ -n "$REPLIT_DOMAINS" ]; then
+    DETECTED_REPLIT_HOST=$(echo "$REPLIT_DOMAINS" | cut -d',' -f1)
+    echo "🔍 Detected via REPLIT_DOMAINS: $DETECTED_REPLIT_HOST"
+fi
+
+# Method 5: Manual override via REPLIT_URL
+if [ -n "$REPLIT_URL" ]; then
+    DETECTED_REPLIT_HOST=$(echo "$REPLIT_URL" | sed 's|https://||' | sed 's|http://||' | sed 's|/$||')
+    echo "🔍 Using manual REPLIT_URL: $DETECTED_REPLIT_HOST"
+fi
+
+# Add the detected host to redirect URIs
+if [ -n "$DETECTED_REPLIT_HOST" ]; then
+    NEW_REDIRECT_URIS=$(echo "$NEW_REDIRECT_URIS" | jq --arg url "https://${DETECTED_REPLIT_HOST}/*" '. += [$url]')
+    NEW_WEB_ORIGINS=$(echo "$NEW_WEB_ORIGINS" | jq --arg url "https://${DETECTED_REPLIT_HOST}" '. += [$url]')
+fi
+
+# Debug: Show available Replit env vars
+echo ""
+echo "📋 Available Replit environment variables:"
+env | grep -i repl | sed 's/=.*/=***/' || echo "   (none found - not running on Replit?)"
+echo ""
 
 # Merge with existing (remove duplicates)
 MERGED_REDIRECTS=$(echo "$CURRENT_REDIRECTS $NEW_REDIRECT_URIS" | jq -s 'add | unique')
