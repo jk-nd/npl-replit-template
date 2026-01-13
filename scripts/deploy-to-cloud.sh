@@ -1,0 +1,42 @@
+#!/bin/bash
+# Deploy NPL protocols to Noumena Cloud
+
+set -e
+
+echo "☁️  Deploying NPL protocols to Noumena Cloud..."
+
+# Ensure NPL CLI is in PATH
+export PATH="$HOME/.npl/bin:$PATH"
+
+# Source .env if it exists
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | xargs)
+fi
+
+# Check required environment variables
+if [ -z "$NPL_TENANT" ]; then
+    echo "❌ Error: NPL_TENANT not set"
+    echo "   Add it in Replit's Secrets tab"
+    exit 1
+fi
+
+if [ -z "$NPL_APP_NAME" ]; then
+    echo "❌ Error: NPL_APP_NAME not set"
+    echo "   Add it in Replit's Secrets tab"
+    exit 1
+fi
+
+echo "   Tenant: $NPL_TENANT"
+echo "   App:    $NPL_APP_NAME"
+echo ""
+
+# Deploy NPL protocols using the CLI
+npl cloud deploy npl \
+    --tenant "$NPL_TENANT" \
+    --app "$NPL_APP_NAME" \
+    --migration "./npl/src/main/migration.yml"
+
+echo ""
+echo "✅ NPL protocols deployed successfully!"
+echo ""
+echo "🔗 View in portal: https://portal.noumena.cloud/${NPL_TENANT}/${NPL_APP_NAME}"

@@ -1,0 +1,117 @@
+# NPL + React Replit Template
+# Build frontends on Replit that connect to Noumena Cloud
+
+run = "npm run dev"
+entrypoint = "src/App.tsx"
+
+hidden = [".config", "node_modules", ".git", "dist"]
+
+[nix]
+channel = "stable-24_05"
+
+[env]
+PATH = "/home/runner/.npl/bin:${PATH}"
+
+# Expose the dev server port
+[[ports]]
+localPort = 5173
+externalPort = 80
+
+# ============================================
+# WORKFLOWS - Click these buttons in Replit!
+# ============================================
+
+[[workflows]]
+name = "🔧 Setup Environment"
+author = "agent"
+description = "Generate .env from tenant/app name"
+
+[[workflows.workflow]]
+task = "shell.exec"
+args = "bash ./scripts/setup-env.sh"
+
+[[workflows]]
+name = "📦 Install NPL CLI"
+author = "agent"
+
+[[workflows.workflow]]
+task = "shell.exec"
+args = "bash ./scripts/install-npl-cli.sh"
+
+[[workflows]]
+name = "🔐 Login to Noumena Cloud"
+author = "agent"
+
+[[workflows.workflow]]
+task = "shell.exec"
+args = "npl cloud login"
+
+[[workflows]]
+name = "✅ Check NPL Code"
+author = "agent"
+
+[[workflows.workflow]]
+task = "shell.exec"
+args = "npl check --source-dir ./npl/src/main"
+
+[[workflows]]
+name = "🧪 Run NPL Tests"
+author = "agent"
+
+[[workflows.workflow]]
+task = "shell.exec"
+args = "npl test --test-source-dir ./npl/src"
+
+[[workflows]]
+name = "🚀 Deploy to Noumena Cloud"
+author = "agent"
+
+[[workflows.workflow]]
+task = "shell.exec"
+args = "bash ./scripts/deploy-to-cloud.sh"
+
+[[workflows]]
+name = "🔧 Generate API Client"
+author = "agent"
+
+[[workflows.workflow]]
+task = "shell.exec"
+args = "bash ./scripts/generate-client.sh"
+
+[[workflows]]
+name = "⚡ Full Setup"
+author = "agent"
+description = "Install deps, deploy NPL, generate client"
+
+[[workflows.workflow]]
+task = "shell.exec"
+args = "bash ./scripts/full-setup.sh"
+
+[[workflows]]
+name = "👥 Provision Dev Users"
+author = "agent"
+description = "Create seed users in Keycloak"
+
+[[workflows.workflow]]
+task = "shell.exec"
+args = "bash ./scripts/provision-users.sh"
+
+[[workflows]]
+name = "🔑 Configure Keycloak Client"
+author = "agent"
+description = "Add localhost & Replit redirect URIs"
+
+[[workflows.workflow]]
+task = "shell.exec"
+args = "bash ./scripts/configure-keycloak-client.sh"
+
+[[workflows]]
+name = "🌐 Deploy Frontend to Cloud"
+author = "agent"
+
+[[workflows.workflow]]
+task = "shell.exec"
+args = "bash ./scripts/deploy-frontend.sh"
+
+[deployment]
+run = ["sh", "-c", "npm run build && npm run preview"]

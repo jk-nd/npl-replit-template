@@ -1,0 +1,45 @@
+package demo
+
+@test
+function test_create_iou(test: Test) -> {
+    var iou = Iou['issuer', 'payee'](100);
+    test.assertEquals(100, iou.getAmountOwed['issuer'](), "Initial amount should be 100");
+};
+
+@test
+function test_partial_payment(test: Test) -> {
+    var iou = Iou['issuer', 'payee'](100);
+    iou.pay['issuer'](30);
+    test.assertEquals(70, iou.getAmountOwed['issuer'](), "Amount owed should be 70 after paying 30");
+};
+
+@test
+function test_full_payment(test: Test) -> {
+    var iou = Iou['issuer', 'payee'](100);
+    iou.pay['issuer'](100);
+    test.assertEquals(iou.activeState().getOrFail(), Iou.States.paid, "IOU should be paid after full payment");
+};
+
+@test
+function test_forgive(test: Test) -> {
+    var iou = Iou['issuer', 'payee'](100);
+    iou.forgive['payee']();
+    test.assertEquals(iou.activeState().getOrFail(), Iou.States.forgiven, "IOU should be forgiven");
+};
+
+@test
+function test_pay_negative_amount_fails(test: Test) -> {
+    var iou = Iou['issuer', 'payee'](100);
+    test.assertFails(function() -> iou.pay['issuer'](-10), "Paying negative amounts should fail");
+};
+
+@test
+function test_pay_more_than_owed_fails(test: Test) -> {
+    var iou = Iou['issuer', 'payee'](100);
+    test.assertFails(function() -> iou.pay['issuer'](150), "Paying more than owed should fail");
+};
+
+@test
+function test_create_with_zero_amount_fails(test: Test) -> {
+    test.assertFails(function() -> Iou['issuer', 'payee'](0), "Creating IOU with zero amount should fail");
+};
