@@ -1,8 +1,8 @@
 # NPL + React Replit Template
 # Build frontends on Replit that connect to Noumena Cloud
 
-run = "npm run dev"
-entrypoint = "src/App.tsx"
+run = "cd frontend && npm run dev"
+entrypoint = "frontend/src/App.tsx"
 
 hidden = [".config", "node_modules", ".git", "dist"]
 
@@ -18,4 +18,67 @@ localPort = 5173
 externalPort = 80
 
 [deployment]
-run = ["sh", "-c", "npm run build && npm run preview"]
+run = ["sh", "-c", "cd frontend && npm run build && npm run preview"]
+
+# Workflow buttons for common tasks
+[workflows]
+
+[workflows.setup]
+name = "🚀 Full Setup"
+description = "Complete setup: env + install + deploy + client"
+command = "make setup"
+
+[workflows.env]
+name = "⚙️ Generate Environment"
+description = "Generate .env from NPL_TENANT and NPL_APP"
+command = "make env"
+
+[workflows.install]
+name = "📦 Install Dependencies"
+description = "Install NPL CLI and npm dependencies"
+command = "make install"
+
+[workflows.deploy]
+name = "☁️ Deploy to Cloud"
+description = "Deploy NPL protocols to Noumena Cloud"
+command = "make deploy"
+
+[workflows.client]
+name = "🔄 Generate API Client"
+description = "Generate TypeScript API client from OpenAPI"
+command = "make client"
+
+[workflows.users]
+name = "👥 Provision Users"
+description = "Provision seed users in Keycloak"
+command = "make users"
+
+[workflows.keycloak]
+name = "🔑 Configure Keycloak"
+description = "Configure Keycloak client (redirect URIs)"
+command = "make keycloak"
+
+[workflows.run]
+name = "▶️ Start Dev Server"
+description = "Start the development server"
+command = "make run"
+
+[workflows.build]
+name = "🏗️ Build Production"
+description = "Build frontend for production"
+command = "make build"
+
+[workflows.check]
+name = "✅ Validate NPL"
+description = "Validate NPL code syntax and types"
+command = "make check"
+
+[workflows.test]
+name = "🧪 Run Tests"
+description = "Run NPL tests"
+command = "make test"
+
+[workflows.clean]
+name = "🧹 Clean"
+description = "Clean generated files and dependencies"
+command = "make clean"

@@ -4,11 +4,14 @@ import App from './App'
 import './index.css'
 import keycloak, { keycloakInit, isDevMode } from './auth/keycloak'
 
-// In dev mode without Keycloak configured, render without auth
+console.log('VITE_DEV_MODE env:', import.meta.env.VITE_DEV_MODE)
+console.log('isDevMode:', isDevMode)
+
 if (isDevMode) {
-  console.log('🔧 Dev Mode: Keycloak authentication bypassed')
+  console.log('🔧 Dev Mode: Using direct OIDC HTTP calls')
   ReactDOM.createRoot(document.getElementById('root')!).render(<App />)
 } else {
+  console.log('📦 Production Mode: Using Keycloak library')
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <ReactKeycloakProvider
       authClient={keycloak}

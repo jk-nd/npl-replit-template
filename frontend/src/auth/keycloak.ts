@@ -1,11 +1,10 @@
 import Keycloak from 'keycloak-js';
 
 /**
- * Check if running in dev mode without Keycloak configured.
- * Set VITE_DEV_MODE=true to bypass authentication for UI development.
+ * Check if running in dev mode with direct OIDC calls.
+ * Set VITE_DEV_MODE=true to use direct OIDC instead of Keycloak agent.
  */
-export const isDevMode = import.meta.env.VITE_DEV_MODE === 'true' || 
-  (!import.meta.env.VITE_KEYCLOAK_URL && import.meta.env.DEV);
+export const isDevMode = import.meta.env.VITE_DEV_MODE === 'true';
 
 /**
  * Keycloak configuration from environment variables.

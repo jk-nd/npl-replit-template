@@ -44,7 +44,7 @@ This document contains everything you need to know about NPL (Noumena Protocol L
 ├── scripts/
 │   ├── setup-env.sh          # Generate .env from tenant/app
 │   ├── install-npl-cli.sh    # Install NPL CLI
-│   ├── deploy-to-cloud.sh    # Deploy NPL to Noumena Cloud
+│   ├── deploy-npl.sh         # Deploy NPL to Noumena Cloud
 │   ├── generate-client.sh    # Generate TypeScript API client
 │   ├── provision-users.sh    # Create seed users in Keycloak
 │   ├── configure-keycloak-client.sh  # Configure Keycloak for Replit
@@ -93,7 +93,7 @@ You only need **two secrets** - all other URLs are derived automatically:
 | Secret | Description | Example |
 |--------|-------------|---------|
 | `NPL_TENANT` | Your Noumena Cloud tenant | `my-company` |
-| `NPL_APP_NAME` | Your Noumena Cloud app | `my-app` |
+| `NPL_APP` | Your Noumena Cloud app | `my-app` |
 
 **Optional secrets** (auto-derived if not set):
 | Secret | Auto-derived Pattern |
@@ -1013,7 +1013,7 @@ Deploy using the migration file:
 ```bash
 npl cloud deploy npl \
   --tenant $NPL_TENANT \
-  --app $NPL_APP_NAME \
+  --app $NPL_APP \
   --migration ./npl/src/main/migration.yml
 ```
 

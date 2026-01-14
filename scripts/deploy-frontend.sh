@@ -12,8 +12,8 @@ if [ -f .env ]; then
 fi
 
 # Check required environment variables
-if [ -z "$NPL_TENANT" ] || [ -z "$NPL_APP_NAME" ]; then
-    echo "❌ Error: NPL_TENANT and NPL_APP_NAME must be set"
+if [ -z "$NPL_TENANT" ] || [ -z "$NPL_APP" ]; then
+    echo "❌ Error: NPL_TENANT and NPL_APP must be set"
     echo "   Run './scripts/setup-env.sh' first"
     exit 1
 fi
@@ -23,14 +23,16 @@ export PATH="$HOME/.npl/bin:$PATH"
 
 # Build the frontend
 echo "📦 Building frontend..."
+cd frontend
 npm run build
+cd ..
 
 # Deploy to cloud
-echo "☁️ Deploying to $NPL_TENANT/$NPL_APP_NAME..."
+echo "☁️ Deploying to $NPL_TENANT/$NPL_APP..."
 npl cloud deploy frontend \
     --tenant "$NPL_TENANT" \
-    --app "$NPL_APP_NAME" \
-    --frontend ./dist
+    --app "$NPL_APP" \
+    --frontend ./frontend/dist
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -38,4 +40,5 @@ echo "✅ Frontend deployment complete!"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 echo "🔗 Your frontend is now live at:"
-echo "   https://${NPL_TENANT}-${NPL_APP_NAME}.noumena.cloud"
+echo "   https://${NPL_TENANT}-${NPL_APP}.noumena.cloud"
+echo ""

@@ -36,7 +36,7 @@ In Replit's **Secrets** tab (🔒), add only **two required secrets**:
 | Secret | Description | Example |
 |--------|-------------|---------|
 | `NPL_TENANT` | Your Noumena Cloud tenant | `my-company` |
-| `NPL_APP_NAME` | Your Noumena Cloud app | `my-app` |
+| `NPL_APP` | Your Noumena Cloud app | `my-app` |
 
 **Find these at:** `portal.noumena.cloud/{tenant}/{app}`
 
@@ -53,6 +53,12 @@ npl cloud login
 This opens a browser to authenticate with your Noumena Cloud account.
 
 ### 3. Run Full Setup
+
+**Option 1: Using Workflows (Recommended)**
+
+Use the **⚙️ Full Setup** workflow from Replit's Tools panel.
+
+**Option 2: Using Make Command**
 
 ```bash
 make setup
@@ -74,7 +80,7 @@ Add these additional secrets for user provisioning:
 | `KEYCLOAK_ADMIN_USER` | Keycloak admin username | Portal > Services > Keycloak |
 | `KEYCLOAK_ADMIN_PASSWORD` | Keycloak admin password | Portal > Services > Keycloak |
 
-Then run:
+Then use the **👥 Provision Users** workflow or run:
 
 ```bash
 make users
@@ -83,6 +89,8 @@ make users
 This creates seed users (alice, bob, eve, etc.) with password `password123456`.
 
 ### 5. Configure Keycloak for Replit
+
+Use the **🔑 Configure Keycloak** workflow or run:
 
 ```bash
 make keycloak
@@ -94,7 +102,7 @@ This configures Keycloak to:
 
 ### 6. Start Developing
 
-Click **Run** to start the React dev server!
+Click the **Run** button or use the **▶️ Start Dev Server** workflow!
 
 ## 📁 Project Structure
 
@@ -103,7 +111,6 @@ Click **Run** to start the React dev server!
 ├── replit.nix           # System dependencies
 ├── replit.md            # AI Agent workflow instructions
 ├── Makefile             # Setup commands
-├── package.json         # Frontend dependencies
 │
 ├── docs/
 │   └── NPL_DEVELOPMENT.md   # Complete NPL reference (for AI Agent)
@@ -111,7 +118,7 @@ Click **Run** to start the React dev server!
 ├── scripts/
 │   ├── setup-env.sh          # Generate .env from tenant/app
 │   ├── install-npl-cli.sh    # Install NPL CLI
-│   ├── deploy-to-cloud.sh    # Deploy NPL to Noumena Cloud
+│   ├── deploy-npl.sh         # Deploy NPL to Noumena Cloud
 │   ├── generate-client.sh    # Generate TypeScript client
 │   ├── provision-users.sh    # Create seed users in Keycloak
 │   ├── configure-keycloak-client.sh  # Configure Keycloak settings
@@ -128,32 +135,164 @@ Click **Run** to start the React dev server!
 │           └── npl/demo/
 │               └── test_iou.npl
 │
-├── src/
-│   ├── main.tsx              # Entry with Keycloak auth
-│   ├── App.tsx               # Main dashboard
-│   ├── auth/
-│   │   └── keycloak.ts       # Keycloak configuration
-│   ├── api/
-│   │   └── npl-client.ts     # NPL API client
-│   └── generated/            # (Auto-generated from OpenAPI)
-│
-└── public/
-    └── silent-check-sso.html
+└── frontend/
+    ├── package.json          # Frontend dependencies
+    ├── tsconfig.json         # TypeScript config
+    ├── vite.config.ts        # Vite build config
+    ├── index.html            # HTML entry point
+    ├── src/
+    │   ├── main.tsx          # Entry with Keycloak auth
+    │   ├── App.tsx           # Main dashboard
+    │   ├── auth/
+    │   │   └── keycloak.ts   # Keycloak configuration
+    │   ├── api/
+    │   │   └── npl-client.ts # NPL API client
+    │   └── generated/        # (Auto-generated from OpenAPI)
+    └── public/
+        └── silent-check-sso.html
 ```
 
-## 🔧 Make Commands
+## 🔧 Workflows & Commands
+
+### Replit Workflows (Recommended)
+
+Use the workflows in Replit's **Tools** panel for a guided experience:
+
+- **⚙️ Full Setup** - Complete setup (env, CLI, deps, deploy, client)
+- **🚀 Cloud Login** - Login to Noumena Cloud
+- **📦 Deploy NPL** - Deploy NPL protocols only
+- **🌐 Deploy Frontend** - Deploy frontend only
+- **🚀 Full Deploy** - Deploy both NPL and frontend
+- **🔄 Generate Client** - Generate TypeScript API client
+- **👥 Provision Users** - Create test users in Keycloak
+- **🔑 Configure Keycloak** - Configure Keycloak for Replit
+- **✅ Check NPL** - Validate NPL code
+- **🧪 Test NPL** - Run NPL tests
+- **▶️ Start Dev Server** - Start the frontend dev server
+- **🏗️ Build Frontend** - Build frontend for production
+
+### Make Commands (Alternative)
 
 | Command | Description |
 |---------|-------------|
 | `make setup` | Full setup (env, CLI, deps, deploy, client) |
 | `make login` | Login to Noumena Cloud |
-| `make deploy` | Deploy NPL protocols |
+| `make deploy` | Deploy both NPL and frontend |
+| `make deploy-npl` | Deploy NPL protocols only |
+| `make deploy-frontend` | Deploy frontend only |
 | `make client` | Generate TypeScript API client |
 | `make users` | Provision test users in Keycloak |
 | `make keycloak` | Configure Keycloak for Replit |
 | `make check` | Validate NPL code |
 | `make test` | Run NPL tests |
 | `make run` | Start the frontend dev server |
+| `make build` | Build frontend for production |
+
+## 🔄 Development Workflow
+
+### Development Stages
+
+This template supports different development modes based on environment variables:
+
+#### 1. **Local Development** (Recommended for UI Development)
+```bash
+# .env configuration
+VITE_DEV_MODE=true      # Use custom login form with direct OIDC calls
+VITE_USE_PROXY=true     # Use Vite proxy to avoid CORS issues
+```
+- Custom login form instead of Keycloak redirect
+- Direct HTTP calls to OIDC endpoints (no Keycloak library)
+- Proxy endpoints (`/auth`, `/npl`) to avoid CORS
+- Faster iteration for UI changes
+- **Run:** Use **▶️ Start Dev Server** workflow or `make run`
+
+#### 2. **Cloud Testing** (Test Against Real Services)
+```bash
+# .env configuration
+VITE_DEV_MODE=true      # Use custom login form
+VITE_USE_PROXY=false    # Direct calls to cloud URLs
+```
+- Custom login form with direct OIDC calls
+- Direct calls to Keycloak and NPL Engine on Noumena Cloud
+- Tests real authentication and API integration
+- **Run:** Use **▶️ Start Dev Server** workflow or `make run`
+
+#### 3. **Production Mode** (Standard Keycloak Flow)
+```bash
+# .env configuration
+VITE_DEV_MODE=false     # Use Keycloak library
+VITE_USE_PROXY=false    # Direct calls to cloud URLs
+```
+- Standard Keycloak redirect flow
+- Uses `keycloak-js` library
+- Full OAuth2/OIDC authorization code flow
+- **Build:** `make build`
+- **Deploy:** `make deploy-frontend`
+
+### Deployment Workflow
+
+#### Full Deployment (NPL + Frontend)
+
+**Using Workflow (Recommended):** Use **🚀 Full Deploy** workflow
+
+**Using Make:**
+```bash
+make deploy
+```
+This runs in sequence:
+1. `make deploy-npl` - Deploys NPL protocols to Noumena Cloud
+2. `make build` - Builds frontend for production
+3. `make deploy-frontend` - Deploys frontend dist/ to Noumena Cloud
+
+#### Deploy NPL Only (Backend Changes)
+
+**Using Workflow (Recommended):** Use **📦 Deploy NPL** workflow
+
+**Using Make:**
+```bash
+make deploy-npl
+```
+When you've made changes to:
+- NPL protocol definitions (`*.npl` files)
+- Protocol logic, permissions, or states
+- No frontend changes needed
+
+After deployment, regenerate the API client:
+
+**Using Workflow:** Use **🔄 Generate Client** workflow
+
+**Using Make:**
+```bash
+make client
+```
+
+#### Deploy Frontend Only (UI Changes)
+
+**Using Workflow (Recommended):** Use **🌐 Deploy Frontend** workflow
+
+**Using Make:**
+```bash
+make build
+make deploy-frontend
+```
+When you've made changes to:
+- React components
+- UI/UX updates
+- Frontend logic
+- No NPL protocol changes
+
+### Environment Variables Reference
+
+| Variable | Values | Description |
+|----------|--------|-------------|
+| `VITE_DEV_MODE` | `true`/`false` | Use custom login (`true`) or Keycloak library (`false`) |
+| `VITE_USE_PROXY` | `true`/`false` | Use Vite proxy (`true`) or direct URLs (`false`) |
+| `VITE_NPL_ENGINE_URL` | URL | NPL Engine endpoint (auto-generated) |
+| `VITE_KEYCLOAK_URL` | URL | Keycloak endpoint (auto-generated) |
+| `VITE_KEYCLOAK_REALM` | realm | Keycloak realm name (auto-generated) |
+| `VITE_KEYCLOAK_CLIENT_ID` | client ID | Keycloak client ID (auto-generated) |
+
+**Note:** After changing environment variables, restart the dev server for changes to take effect.
 
 ## 📖 NPL Development
 
@@ -173,7 +312,7 @@ npl openapi --source-dir ./npl/src/main
 npl cloud login
 
 # Deploy to cloud
-npl cloud deploy npl --tenant $NPL_TENANT --app $NPL_APP_NAME --migration ./npl/src/main/migration.yml
+npl cloud deploy npl --tenant $NPL_TENANT --app $NPL_APP --migration ./npl/src/main/migration.yml
 ```
 
 ### NPL Code Style

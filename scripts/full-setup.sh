@@ -1,5 +1,5 @@
 #!/bin/bash
-# Full setup: configure env, install deps, deploy NPL, generate client
+# Full setup: configure env, install deps, create app
 
 set -e
 
@@ -8,19 +8,28 @@ echo ""
 
 # Step 1: Generate environment configuration
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Step 1/5: Setting up Noumena Cloud configuration"
+echo "Step 1/4: Setting up Noumena Cloud configuration"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # Check required environment variables (only need tenant and app name!)
-if [ -z "$NPL_TENANT" ] || [ -z "$NPL_APP_NAME" ]; then
+if [ -z "$NPL_TENANT" ] || [ -z "$NPL_APP" ]; then
     echo "❌ Missing required Secrets. Please add these in Replit's Secrets tab:"
     echo ""
     echo "   NPL_TENANT     - Your Noumena Cloud tenant (e.g., 'tim')"
-    echo "   NPL_APP_NAME   - Your Noumena Cloud app (e.g., 'test')"
+    echo "   NPL_APP        - Your Noumena Cloud app (e.g., 'test')"
     echo ""
     echo "📝 Find these at: https://portal.noumena.cloud"
     echo "   The URL shows: portal.noumena.cloud/{tenant}/{app}"
     exit 1
+fi
+echo ""
+
+# Create the app on Noumena Cloud (idempotent - won't fail if already exists)
+echo "☁️  Creating app on Noumena Cloud..."
+if npl cloud create --tenant "$NPL_TENANT" --app-name "$NPL_APP" 2>&1; then
+    echo "✅ App created or already exists"
+else
+    echo "⚠️  App creation failed or already exists - continuing..."
 fi
 
 # Run environment setup to generate .env file
@@ -32,7 +41,7 @@ echo ""
 
 # Step 2: Install NPL CLI
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Step 2/5: Installing NPL CLI"
+echo "Step 2/4: Installing NPL CLI"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 ./scripts/install-npl-cli.sh
 export PATH="$HOME/.npl/bin:$PATH"
@@ -40,14 +49,14 @@ echo ""
 
 # Step 3: Install npm dependencies
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Step 3/5: Installing npm dependencies"
+echo "Step 3/4: Installing npm dependencies"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-npm install
+cd frontend && npm install && cd ..
 echo ""
 
-# Step 4: Login and deploy
+# Step 4: Create app on Noumena Cloud
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Step 4/5: Deploying NPL to Noumena Cloud"
+echo "Step 4/4: Creating app on Noumena Cloud"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
@@ -56,31 +65,32 @@ echo "✅ Checking NPL code..."
 npl check --source-dir ./npl/src/main
 echo ""
 
-# Try to deploy - if it fails due to auth, prompt for login
-echo "☁️  Deploying to Noumena Cloud..."
-if ! ./scripts/deploy-to-cloud.sh 2>&1; then
-    echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "🔐 Authentication required!"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo ""
-    echo "Please log in to Noumena Cloud first:"
-    echo ""
-    echo "   npl cloud login"
-    echo ""
-    echo "Then run setup again:"
-    echo ""
-    echo "   make setup"
-    echo ""
-    exit 1
+# Create the app on Noumena Cloud (idempotent - won't fail if already exists)
+echo "☁️  Creating app on Noumena Cloud..."
+if npl cloud create --tenant "$NPL_TENANT" --app-name "$NPL_APP" 2>&1; then
+    echo "✅ App created or already exists"
+else
+    echo "⚠️  App creation failed or already exists - continuing..."
 fi
 echo ""
 
-# Step 5: Generate client
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Step 5/5: Generating API client from OpenAPI"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-./scripts/generate-client.sh
+# Wait for app to be ready
+echo "⏳ Checking app status..."
+MAX_RETRIES=30
+RETRY_COUNT=0
+while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+    if npl cloud status 2>&1 | grep -q "$NPL_APP.*\[active\].*🟢"; then
+        echo "✅ App is ready!"
+        break
+    fi
+    RETRY_COUNT=$((RETRY_COUNT + 1))
+    if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+        echo "⏳ App not ready yet, waiting... ($RETRY_COUNT/$MAX_RETRIES)"
+        sleep 5
+    else
+        echo "⚠️  App status check timed out, proceeding anyway..."
+    fi
+done
 echo ""
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -89,9 +99,10 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 echo "📝 Next steps:"
 echo ""
-echo "   1. Provision test users:  make users"
-echo "   2. Configure Keycloak:    make keycloak"
-echo "   3. Click 'Run' to start your React frontend!"
+echo "   1. Deploy NPL:            Use '🚀 Deploy NPL' workflow"
+echo "   2. Provision test users:  Use '👥 Provision Users' workflow"
+echo "   3. Configure Keycloak:    Use '🔑 Configure Keycloak' workflow"
+echo "   4. Click 'Run' or use '▶️ Start Dev Server' workflow!"
 echo ""
 echo "📖 Your app will connect to:"
 echo "   NPL Engine: $VITE_NPL_ENGINE_URL"

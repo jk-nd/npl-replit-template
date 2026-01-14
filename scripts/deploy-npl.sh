@@ -20,23 +20,23 @@ if [ -z "$NPL_TENANT" ]; then
     exit 1
 fi
 
-if [ -z "$NPL_APP_NAME" ]; then
-    echo "❌ Error: NPL_APP_NAME not set"
+if [ -z "$NPL_APP" ]; then
+    echo "❌ Error: NPL_APP not set"
     echo "   Add it in Replit's Secrets tab"
     exit 1
 fi
 
 echo "   Tenant: $NPL_TENANT"
-echo "   App:    $NPL_APP_NAME"
+echo "   App:    $NPL_APP"
 echo ""
 
 # Deploy NPL protocols using the CLI
 npl cloud deploy npl \
     --tenant "$NPL_TENANT" \
-    --app "$NPL_APP_NAME" \
+    --app "$NPL_APP" \
     --migration "./npl/src/main/migration.yml"
 
 echo ""
 echo "✅ NPL protocols deployed successfully!"
 echo ""
-echo "🔗 View in portal: https://portal.noumena.cloud/${NPL_TENANT}/${NPL_APP_NAME}"
+echo "🔗 View in portal: https://portal.noumena.cloud/${NPL_TENANT}/${NPL_APP}"

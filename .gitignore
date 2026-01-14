@@ -10,7 +10,8 @@ dist/
 .env.*.local
 
 # Generated files
-src/generated/
+frontend/src/generated/
+
 
 # IDE
 .idea/
@@ -24,6 +25,7 @@ Thumbs.db
 
 # NPL CLI
 .npl/
+openapi/
 
 # Logs
 *.log

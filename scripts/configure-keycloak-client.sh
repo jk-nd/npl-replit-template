@@ -13,8 +13,8 @@ if [ -f .env ]; then
 fi
 
 # Check required environment variables
-if [ -z "$NPL_TENANT" ] || [ -z "$NPL_APP_NAME" ]; then
-    echo "❌ Error: NPL_TENANT and NPL_APP_NAME must be set"
+if [ -z "$NPL_TENANT" ] || [ -z "$NPL_APP" ]; then
+    echo "❌ Error: NPL_TENANT and NPL_APP must be set"
     echo "   Run './scripts/setup-env.sh' first"
     exit 1
 fi
@@ -29,9 +29,9 @@ if [ -z "$KEYCLOAK_ADMIN_USER" ] || [ -z "$KEYCLOAK_ADMIN_PASSWORD" ]; then
     exit 1
 fi
 
-KEYCLOAK_URL="${VITE_KEYCLOAK_URL:-https://keycloak-${NPL_TENANT}-${NPL_APP_NAME}.noumena.cloud}"
-REALM="${VITE_KEYCLOAK_REALM:-${NPL_APP_NAME}}"
-CLIENT_ID="${VITE_KEYCLOAK_CLIENT_ID:-${NPL_APP_NAME}}"
+KEYCLOAK_URL="${VITE_KEYCLOAK_URL:-https://keycloak-${NPL_TENANT}-${NPL_APP}.noumena.cloud}"
+REALM="${VITE_KEYCLOAK_REALM:-${NPL_APP}}"
+CLIENT_ID="${VITE_KEYCLOAK_CLIENT_ID:-${NPL_APP}}"
 
 echo "📋 Configuration:"
 echo "   Keycloak URL: $KEYCLOAK_URL"

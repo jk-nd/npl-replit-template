@@ -1,7 +1,7 @@
 # NPL + React Replit Template Makefile
 # Alternative to workflow buttons for those who prefer make
 
-.PHONY: help setup env install deploy client users keycloak run build clean
+.PHONY: help setup env install deploy deploy-npl deploy-frontend client users keycloak run build clean
 
 # Default target
 help:
@@ -10,10 +10,12 @@ help:
 	@echo "Usage: make <target>"
 	@echo ""
 	@echo "Setup targets:"
-	@echo "  setup      - Full setup (env + install + deploy + client)"
-	@echo "  env        - Generate .env from NPL_TENANT and NPL_APP_NAME"
+	@echo "  setup      - Full setup (env + install + deploy-npl + client)"
+	@echo "  env        - Generate .env from NPL_TENANT and NPL_APP"
 	@echo "  install    - Install NPL CLI and npm dependencies"
-	@echo "  deploy     - Deploy NPL protocols to Noumena Cloud"
+	@echo "  deploy     - Deploy both NPL and frontend to Noumena Cloud"
+	@echo "  deploy-npl - Deploy NPL protocols to Noumena Cloud"
+	@echo "  deploy-frontend - Deploy frontend to Noumena Cloud"
 	@echo "  client     - Generate TypeScript API client from OpenAPI"
 	@echo "  users      - Provision seed users in Keycloak"
 	@echo "  keycloak   - Configure Keycloak client (redirect URIs)"
@@ -26,16 +28,16 @@ help:
 	@echo ""
 	@echo "Required environment variables:"
 	@echo "  NPL_TENANT          - Your Noumena Cloud tenant"
-	@echo "  NPL_APP_NAME        - Your Noumena Cloud app name"
+	@echo "  NPL_APP        - Your Noumena Cloud app name"
 	@echo ""
 	@echo "Optional (for user provisioning):"
 	@echo "  KEYCLOAK_ADMIN_USER     - Keycloak admin username"
 	@echo "  KEYCLOAK_ADMIN_PASSWORD - Keycloak admin password"
 
 # Full setup
-setup: env install deploy client
+setup: env install deploy-npl client
 	@echo ""
-	@echo "✅ Setup complete! Run 'make run' to start the frontend."
+	@echo "✅ Setup complete! Use the '▶️ Start Dev Server' workflow or click 'Run' button."
 
 # Generate environment configuration
 env:
@@ -44,11 +46,16 @@ env:
 # Install dependencies
 install:
 	@./scripts/install-npl-cli.sh
-	@npm install
+	@cd frontend && npm install
+
+# Deploy both NPL and frontend
+deploy: deploy-npl build deploy-frontend
+	@echo ""
+	@echo "✅ Full deployment complete!"
 
 # Deploy NPL to Noumena Cloud
-deploy:
-	@./scripts/deploy-to-cloud.sh
+deploy-npl:
+	@./scripts/deploy-npl.sh
 
 # Generate TypeScript client
 client:
@@ -64,11 +71,15 @@ keycloak:
 
 # Start development server
 run:
-	@npm run dev
+	@cd frontend && npm run dev
 
 # Build for production
 build:
-	@npm run build
+	@cd frontend && npm run build
+
+# Deploy frontend to Noumena Cloud
+deploy-frontend:
+	@./scripts/deploy-frontend.sh
 
 # Validate NPL code
 check:
@@ -80,5 +91,5 @@ test:
 
 # Clean generated files
 clean:
-	@rm -rf node_modules dist src/generated .env
+	@rm -rf frontend/node_modules frontend/dist frontend/src/generated .env
 	@echo "Cleaned generated files"

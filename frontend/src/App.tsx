@@ -2,26 +2,94 @@ import { useKeycloak } from '@react-keycloak/web'
 import { useState, useEffect, useCallback } from 'react'
 import { NPLClient, ProtocolInstance, partyFromEmail } from './api/npl-client'
 import { isDevMode } from './auth/keycloak'
+import { OIDCClient } from './auth/oidc-client'
 import './App.css'
 
-// Mock keycloak for dev mode
-const mockKeycloak = {
-  token: 'dev-mode-token',
-  tokenParsed: {
-    email: 'dev@example.com',
-    preferred_username: 'dev-user'
-  },
-  login: () => alert('Dev mode: Login not available'),
-  logout: () => window.location.reload()
-} as unknown as Keycloak.KeycloakInstance
+// OIDC client instance for dev mode
+let oidcClient: OIDCClient | null = null
+
+if (isDevMode) {
+  oidcClient = new OIDCClient({
+    url: import.meta.env.VITE_KEYCLOAK_URL || 'http://localhost:11000',
+    realm: import.meta.env.VITE_KEYCLOAK_REALM || 'demo',
+    clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID || 'frontend'
+  })
+}
 
 function App() {
-  // In dev mode, skip Keycloak initialization
   if (isDevMode) {
-    return <Dashboard keycloak={mockKeycloak} />
+    return <OIDCApp />
+  }
+  return <KeycloakApp />
+}
+
+function OIDCApp() {
+  const [initialized, setInitialized] = useState(false)
+  const [authenticated, setAuthenticated] = useState(false)
+  const [loginError, setLoginError] = useState<string | null>(null)
+  const [userInfo, setUserInfo] = useState<{ email: string; preferred_username: string }>({ 
+    email: '', 
+    preferred_username: '' 
+  })
+
+  useEffect(() => {
+    const initOIDC = async () => {
+      if (!oidcClient) return
+      
+      const isAuth = await oidcClient.init()
+      setAuthenticated(isAuth)
+      setInitialized(true)
+    }
+    initOIDC()
+  }, [])
+
+  useEffect(() => {
+    const loadUserInfo = async () => {
+      if (!oidcClient || !authenticated) return
+      try {
+        const info = await oidcClient.getUserInfo()
+        setUserInfo({
+          email: info.email || info.preferred_username || 'unknown',
+          preferred_username: info.preferred_username || info.email || 'unknown'
+        })
+      } catch (err) {
+        console.error('Failed to load user info:', err)
+      }
+    }
+    loadUserInfo()
+  }, [authenticated])
+
+  const handleLogin = async (username: string, password: string) => {
+    if (!oidcClient) return
+    
+    try {
+      setLoginError(null)
+      await oidcClient.loginWithPassword(username, password)
+      setAuthenticated(true)
+    } catch (err) {
+      setLoginError(err instanceof Error ? err.message : 'Login failed')
+    }
   }
 
-  return <KeycloakApp />
+  if (!initialized) {
+    return <LoadingState message="Initializing OIDC..." />
+  }
+
+  if (!authenticated) {
+    return <DevLoginForm onLogin={handleLogin} error={loginError} />
+  }
+
+  // Create a mock Keycloak-compatible object for Dashboard
+  const mockKeycloak = {
+    token: '',
+    tokenParsed: userInfo,
+    logout: () => oidcClient?.logout()
+  } as unknown as Keycloak.KeycloakInstance
+
+  // Override getToken to use OIDC client
+  const getOIDCToken = async () => oidcClient?.getToken() || ''
+
+  return <Dashboard keycloak={mockKeycloak} getTokenOverride={getOIDCToken} />
 }
 
 function KeycloakApp() {
@@ -65,21 +133,91 @@ function LoginPrompt({ onLogin }: { onLogin: () => void }) {
   )
 }
 
-interface DashboardProps {
-  keycloak: Keycloak.KeycloakInstance
+function DevLoginForm({ onLogin, error }: { onLogin: (username: string, password: string) => void, error: string | null }) {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    await onLogin(username, password)
+    setLoading(false)
+  }
+
+  return (
+    <div className="login-container">
+      <div className="login-card">
+        <div className="login-header">
+          <h1>NPL Demo</h1>
+          <p>Dev Mode - Direct OIDC Login</p>
+        </div>
+        <form onSubmit={handleSubmit} className="login-form">
+          {error && (
+            <div className="error-message" style={{ padding: '12px', marginBottom: '16px', backgroundColor: '#fee', border: '1px solid #fcc', borderRadius: '4px', color: '#c33' }}>
+              {error}
+            </div>
+          )}
+          <div className="form-group">
+            <label htmlFor="username">Username or Email</label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter username"
+              required
+              disabled={loading}
+              style={{ width: '100%', padding: '10px', marginTop: '4px', border: '1px solid #ddd', borderRadius: '4px' }}
+            />
+          </div>
+          <div className="form-group" style={{ marginTop: '16px' }}>
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
+              required
+              disabled={loading}
+              style={{ width: '100%', padding: '10px', marginTop: '4px', border: '1px solid #ddd', borderRadius: '4px' }}
+            />
+          </div>
+          <button 
+            type="submit" 
+            className="login-button" 
+            disabled={loading}
+            style={{ marginTop: '24px' }}
+          >
+            {loading ? 'Signing in...' : 'Sign in'}
+          </button>
+        </form>
+      </div>
+    </div>
+  )
 }
 
-function Dashboard({ keycloak }: DashboardProps) {
+interface DashboardProps {
+  keycloak: Keycloak.KeycloakInstance
+  getTokenOverride?: () => Promise<string>
+}
+
+function Dashboard({ keycloak, getTokenOverride }: DashboardProps) {
   const [ious, setIous] = useState<ProtocolInstance[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showCreateForm, setShowCreateForm] = useState(false)
 
-  const engineUrl = import.meta.env.VITE_NPL_ENGINE_URL || 'http://localhost:12000'
+  // Use proxy endpoint if enabled, otherwise use direct URL
+  const useProxy = import.meta.env.VITE_USE_PROXY === 'true'
+  const engineUrl = useProxy 
+    ? '' 
+    : (import.meta.env.VITE_NPL_ENGINE_URL || 'http://localhost:12000')
   
   const client = new NPLClient({
     engineUrl,
-    getToken: async () => keycloak.token!,
+    getToken: getTokenOverride || (async () => keycloak.token!),
     packageName: 'demo'
   })
 

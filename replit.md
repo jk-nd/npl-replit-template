@@ -52,8 +52,8 @@ Before writing code, understand what the user wants to build:
 | `docs/NPL_DEVELOPMENT.md` | **NPL syntax, types, and API reference** (READ THIS FIRST) |
 | `npl/src/main/migration.yml` | Deployment configuration |
 | `npl/src/main/npl-1.0/` | NPL protocol source code |
-| `src/generated/api-types.ts` | Auto-generated TypeScript types |
-| `src/api/npl-client.ts` | API client for calling NPL Engine |
+| `frontend/src/generated/api-types.ts` | Auto-generated TypeScript types |
+| `frontend/src/api/npl-client.ts` | API client for calling NPL Engine |
 
 ---
 
