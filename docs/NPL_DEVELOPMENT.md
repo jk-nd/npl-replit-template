@@ -1067,6 +1067,73 @@ This fetches the new OpenAPI spec and generates updated types.
 - `npl cloud deploy npl` - Deploy NPL protocols to cloud
 - `npl cloud deploy frontend` - Deploy frontend to cloud
 
+---
+
+## NPL CLI MCP Integration
+
+The NPL CLI supports the **Model Context Protocol (MCP)**, allowing AI agents to interact directly with NPL tools.
+
+### Starting the MCP Server
+
+```bash
+npl mcp
+```
+
+This starts an MCP server exposing the following tools:
+
+| MCP Tool | Description |
+|----------|-------------|
+| `check` | Validate NPL source code |
+| `test` | Run NPL tests |
+| `openapi` | Generate OpenAPI specification |
+| `puml` | Generate PlantUML diagrams |
+| `deploy` | Deploy locally |
+| `cloud_login` | Login to Noumena Cloud |
+| `cloud_logout` | Logout from Noumena Cloud |
+| `cloud_clear` | Clear cloud deployment |
+| `cloud_deploy_npl` | Deploy NPL protocols to cloud |
+| `cloud_deploy_frontend` | Deploy frontend to cloud |
+
+### Configuring MCP for AI Editors
+
+#### Cursor IDE
+
+Create `.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "npl": {
+      "command": "npl",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+#### Claude Desktop
+
+Add to `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "npl": {
+      "command": "npl",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+### Benefits of MCP
+
+- **Direct tool access**: AI agents can validate code, run tests, and deploy without shell commands
+- **Structured responses**: Better error handling and result parsing
+- **Integrated workflow**: Seamless development experience
+
+---
+
 ## Tech Stack
 
 - **Frontend**: React 19, TypeScript, Vite

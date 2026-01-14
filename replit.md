@@ -102,6 +102,22 @@ if (instance["@actions"].includes("approve")) {
 
 ---
 
+---
+
+## NPL CLI MCP Support
+
+The NPL CLI supports the Model Context Protocol (MCP). Run `npl mcp` to start an MCP server with these tools:
+
+- `check` - Validate NPL code
+- `test` - Run NPL tests
+- `openapi` - Generate OpenAPI spec
+- `cloud_deploy_npl` - Deploy to Noumena Cloud
+- `cloud_deploy_frontend` - Deploy frontend
+
+See `docs/NPL_DEVELOPMENT.md` for MCP configuration details.
+
+---
+
 ## DO NOT DELETE OR OVERWRITE
 
 **The file `docs/NPL_DEVELOPMENT.md` contains critical NPL documentation. Do not delete, overwrite, or modify it unless explicitly asked to update NPL syntax or examples.**
