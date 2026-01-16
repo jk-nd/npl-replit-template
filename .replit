@@ -5,80 +5,143 @@ run = "cd frontend && npm run dev"
 entrypoint = "frontend/src/App.tsx"
 
 hidden = [".config", "node_modules", ".git", "dist"]
+modules = ["nodejs-20", "bash", "web"]
 
 [nix]
-channel = "stable-24_05"
+channel = "stable-25_05"
 
 [env]
 PATH = "/home/runner/.npl/bin:${PATH}"
 
-# Expose the dev server port
 [[ports]]
-localPort = 5173
+localPort = 5000
 externalPort = 80
 
 [deployment]
 run = ["sh", "-c", "cd frontend && npm run build && npm run preview"]
 
-# Workflow buttons for common tasks
 [workflows]
+runButton = "Project"
 
-[workflows.setup]
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start Dev Server"
+
+[[workflows.workflow]]
+name = "Start Dev Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd frontend && npm run dev -- --port 5000 --host 0.0.0.0"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[workflows.workflow]]
 name = "🚀 Full Setup"
-description = "Complete setup: env + install + deploy + client"
-command = "make setup"
+mode = "sequential"
+author = "agent"
 
-[workflows.env]
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "make setup"
+
+[[workflows.workflow]]
 name = "⚙️ Generate Environment"
-description = "Generate .env from NPL_TENANT and NPL_APP"
-command = "make env"
+mode = "sequential"
+author = "agent"
 
-[workflows.install]
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "make env"
+
+[[workflows.workflow]]
 name = "📦 Install Dependencies"
-description = "Install NPL CLI and npm dependencies"
-command = "make install"
+mode = "sequential"
+author = "agent"
 
-[workflows.deploy]
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "make install"
+
+[[workflows.workflow]]
 name = "☁️ Deploy to Cloud"
-description = "Deploy NPL protocols to Noumena Cloud"
-command = "make deploy"
+mode = "sequential"
+author = "agent"
 
-[workflows.client]
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "make deploy"
+
+[[workflows.workflow]]
 name = "🔄 Generate API Client"
-description = "Generate TypeScript API client from OpenAPI"
-command = "make client"
+mode = "sequential"
+author = "agent"
 
-[workflows.users]
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "make client"
+
+[[workflows.workflow]]
 name = "👥 Provision Users"
-description = "Provision seed users in Keycloak"
-command = "make users"
+mode = "sequential"
+author = "agent"
 
-[workflows.keycloak]
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "make users"
+
+[[workflows.workflow]]
 name = "🔑 Configure Keycloak"
-description = "Configure Keycloak client (redirect URIs)"
-command = "make keycloak"
+mode = "sequential"
+author = "agent"
 
-[workflows.run]
-name = "▶️ Start Dev Server"
-description = "Start the development server"
-command = "make run"
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "make keycloak"
 
-[workflows.build]
+[[workflows.workflow]]
 name = "🏗️ Build Production"
-description = "Build frontend for production"
-command = "make build"
+mode = "sequential"
+author = "agent"
 
-[workflows.check]
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "make build"
+
+[[workflows.workflow]]
 name = "✅ Validate NPL"
-description = "Validate NPL code syntax and types"
-command = "make check"
+mode = "sequential"
+author = "agent"
 
-[workflows.test]
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "make check"
+
+[[workflows.workflow]]
 name = "🧪 Run Tests"
-description = "Run NPL tests"
-command = "make test"
+mode = "sequential"
+author = "agent"
 
-[workflows.clean]
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "make test"
+
+[[workflows.workflow]]
 name = "🧹 Clean"
-description = "Clean generated files and dependencies"
-command = "make clean"
+mode = "sequential"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "make clean"
+
+[agent]
+expertMode = true
