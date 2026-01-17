@@ -98,7 +98,8 @@ make preflight
 ├── Makefile             # Setup commands
 │
 ├── docs/
-│   └── NPL_DEVELOPMENT.md   # Complete NPL reference (for AI Agent)
+│   ├── NPL_DEVELOPMENT.md         # Complete NPL reference (for AI Agent)
+│   └── NPL_FRONTEND_DEVELOPMENT.md # Frontend patterns - parties, claims, @actions
 │
 ├── scripts/
 │   ├── setup-env.sh          # Generate .env from tenant/app
@@ -402,10 +403,14 @@ const ious = await client.list('Iou', { state: 'unpaid' });
 This template is designed to work with Replit Agent. The agent should:
 
 1. **Read `docs/NPL_DEVELOPMENT.md` first** - Contains complete NPL syntax, types, and API reference
-2. **Design backend (NPL) before frontend** - The frontend depends on the generated API
-3. **Use `@actions` array** - Shows what the current user can do on each protocol instance
+2. **Read `docs/NPL_FRONTEND_DEVELOPMENT.md`** - Explains how NPL drives frontend patterns (parties, claims, @actions)
+3. **Use `frontend/CUSTOMIZATION_GUIDE.md`** - Step-by-step guide for adapting the template
+4. **Design backend (NPL) before frontend** - The frontend depends on the generated API
 
-The `replit.md` file contains workflow instructions. The comprehensive NPL documentation is in `docs/NPL_DEVELOPMENT.md` to prevent accidental overwriting.
+The `replit.md` file contains workflow instructions. Documentation is split to prevent accidental overwriting:
+- `docs/NPL_DEVELOPMENT.md` - Backend NPL syntax
+- `docs/NPL_FRONTEND_DEVELOPMENT.md` - Frontend integration patterns
+- `frontend/CUSTOMIZATION_GUIDE.md` - Practical template adaptation
 
 ## 🚀 Deployment Options
 
