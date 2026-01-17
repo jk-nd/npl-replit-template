@@ -49,7 +49,7 @@ This document contains everything you need to know about NPL (Noumena Protocol L
 │   ├── provision-users.sh    # Create seed users in Keycloak
 │   ├── configure-keycloak-client.sh  # Configure Keycloak for Replit
 │   ├── deploy-frontend.sh    # Deploy frontend to Noumena Cloud
-│   └── full-setup.sh         # Run complete setup
+│   └── preflight-check.sh    # Validate environment setup
 ├── npl/
 │   └── src/
 │       └── main/

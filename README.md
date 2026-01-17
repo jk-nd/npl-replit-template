@@ -107,8 +107,7 @@ make preflight
 │   ├── generate-client.sh    # Generate TypeScript client
 │   ├── provision-users.sh    # Create seed users in Keycloak
 │   ├── configure-keycloak-client.sh  # Configure Keycloak settings
-│   ├── deploy-frontend.sh    # Deploy frontend to Cloud
-│   └── full-setup.sh         # Complete setup orchestration
+│   └── deploy-frontend.sh    # Deploy frontend to Cloud
 │
 ├── npl/
 │   └── src/
