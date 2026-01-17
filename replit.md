@@ -19,6 +19,40 @@ make setup
 ```
 This interactive command handles everything. A browser will open for login - the user must complete authentication.
 
+---
+
+## ⚠️ Common Pitfalls
+
+### 1. Production Build: VITE_DEV_MODE must be false
+For cloud deployment, `VITE_DEV_MODE` must be `false`. Set it directly in the build command:
+```bash
+VITE_DEV_MODE=false npm run build
+```
+Don't rely on `.env` settings for production - inline environment variables take priority.
+
+### 2. React API Client: Use useMemo()
+**Always wrap `createApiClient()` with `useMemo()`** to prevent infinite re-render loops:
+```typescript
+// ❌ BAD - causes infinite re-renders
+const client = createApiClient(token);
+
+// ✅ GOOD - stable client reference
+const client = useMemo(() => createApiClient(token), [token]);
+```
+
+### 3. Protocol Migration: Clear before deploy
+If you change protocol structure (rename, add/remove fields), clear old definitions first:
+```bash
+npl cloud clear --tenant $NPL_TENANT --app $NPL_APP
+make deploy-npl
+```
+Old protocol definitions can conflict with new ones.
+
+### 4. Environment Variable Priority
+- `.env` → Used for development
+- Inline variables in scripts → Take priority over `.env`
+- For production builds, always set `VITE_DEV_MODE=false` directly in the build command
+
 ### Production Reminders
 - **Test users exist**: If `make users` was run, test users (alice, bob, etc.) with password `password123456` exist in Keycloak. Remind users to remove these for production.
 - **Keycloak realm title**: The login page title shows the realm name (NPL_APP). This can be customized in Keycloak admin console under Realm Settings > Themes.

@@ -464,6 +464,28 @@ If you prefer to host your frontend on Replit (e.g., for demo purposes or custom
 **Cause:** Keycloak CSP blocking iframe embedding  
 **Solution:** Run `make keycloak` to update CSP settings, then restart the dev server.
 
+### Infinite re-renders in React components
+**Cause:** API client recreated on every render  
+**Solution:** Wrap `createApiClient()` with `useMemo()`:
+```typescript
+const client = useMemo(() => createApiClient(token), [token]);
+```
+
+### Protocol changes not reflecting after deploy
+**Cause:** Old protocol definitions conflicting with new ones  
+**Solution:** Clear and redeploy:
+```bash
+npl cloud clear --tenant $NPL_TENANT --app $NPL_APP
+make deploy-npl
+```
+
+### Production build still uses dev mode auth
+**Cause:** `.env` settings not overriding in production  
+**Solution:** Set `VITE_DEV_MODE=false` directly in build command:
+```bash
+VITE_DEV_MODE=false npm run build
+```
+
 ### "Please login again" error during deploy
 **Cause:** NPL CLI session expired  
 **Solution:** Run `make login` or `npl cloud login`
