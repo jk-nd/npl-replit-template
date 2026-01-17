@@ -67,6 +67,7 @@ Old protocol definitions can conflict with new ones.
 |----------|---------|
 | `docs/NPL_DEVELOPMENT.md` | NPL syntax, types, methods, and common mistakes |
 | `docs/NPL_FRONTEND_DEVELOPMENT.md` | **How NPL drives frontend patterns** - parties, claims, @actions |
+| `frontend/CUSTOMIZATION_GUIDE.md` | **Step-by-step** template adaptation with code examples |
 
 The frontend guide is **critical** - it explains how to:
 - Use `@actions` array to show/hide buttons dynamically
