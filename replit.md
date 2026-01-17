@@ -52,8 +52,8 @@ Before writing code, understand what the user wants to build:
 | `docs/NPL_DEVELOPMENT.md` | **NPL syntax, types, and API reference** (READ THIS FIRST) |
 | `npl/src/main/migration.yml` | Deployment configuration |
 | `npl/src/main/npl-1.0/` | NPL protocol source code |
-| `frontend/src/generated/api-types.ts` | Auto-generated TypeScript types |
-| `frontend/src/api/npl-client.ts` | API client for calling NPL Engine |
+| `frontend/src/generated/` | Auto-generated TypeScript types from OpenAPI |
+| `frontend/src/api/client.ts` | API client for calling NPL Engine |
 
 ---
 
@@ -92,12 +92,16 @@ if (instance["@actions"].includes("approve")) {
 
 | Command | Description |
 |---------|-------------|
-| `make setup` | Full setup (login first with `npl cloud login`) |
+| `make setup` | **Interactive** full setup (installs, prompts for login, deploys, offers optional steps) |
+| `make setup-quick` | Non-interactive setup (use if already logged in) |
+| `make preflight` | Check if environment is correctly configured |
+| `make login` | Login to Noumena Cloud |
 | `make check` | Validate NPL code |
-| `make deploy` | Deploy NPL to Noumena Cloud |
+| `make deploy` | Deploy both NPL and frontend |
+| `make deploy-npl` | Deploy only NPL protocols |
 | `make client` | Generate TypeScript client |
-| `make users` | Create test users |
-| `make keycloak` | Configure Keycloak for Replit |
+| `make users` | Create test users (alice, bob, etc.) |
+| `make keycloak` | Configure Keycloak for Replit (enables dev mode) |
 | `make run` | Start frontend dev server |
 
 ---

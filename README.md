@@ -42,21 +42,11 @@ In Replit's **Secrets** tab (🔒), add only **two required secrets**:
 
 All other URLs (NPL Engine, Keycloak) are **automatically derived** from these!
 
-### 2. Login to Noumena Cloud
-
-Open the Shell and run:
-
-```bash
-npl cloud login
-```
-
-This opens a browser to authenticate with your Noumena Cloud account.
-
-### 3. Run Full Setup
+### 2. Run Full Setup (Interactive)
 
 **Option 1: Using Workflows (Recommended)**
 
-Use the **⚙️ Full Setup** workflow from Replit's Tools panel.
+Use the **🚀 Full Setup** workflow from Replit's Tools panel.
 
 **Option 2: Using Make Command**
 
@@ -64,45 +54,40 @@ Use the **⚙️ Full Setup** workflow from Replit's Tools panel.
 make setup
 ```
 
-This will:
-- Generate `.env` file with derived URLs
-- Install the NPL CLI
-- Install npm dependencies  
-- Deploy your NPL code to Noumena Cloud
-- Generate TypeScript API client
+This **interactive** setup will:
+1. Generate `.env` file with derived URLs
+2. Install the NPL CLI and npm dependencies
+3. **Prompt you to login** to Noumena Cloud (opens browser)
+4. Deploy your NPL code to Noumena Cloud
+5. Generate TypeScript API client
+6. **Ask if you want to configure Keycloak** (enables dev mode login)
+7. **Ask if you want to provision test users** (alice, bob, etc.)
 
-### 4. Provision Test Users (Optional)
+> **Already logged in?** Use `make setup-quick` to skip the login prompt.
 
-Add these additional secrets for user provisioning:
+### 3. Start Developing
 
-| Secret | Description | Where to Find |
-|--------|-------------|---------------|
-| `KEYCLOAK_ADMIN_USER` | Keycloak admin username | Portal > Services > Keycloak |
-| `KEYCLOAK_ADMIN_PASSWORD` | Keycloak admin password | Portal > Services > Keycloak |
+Click the **Run** button or use the **▶️ Start Dev Server** workflow!
 
-Then use the **👥 Provision Users** workflow or run:
+### Optional: Manual Configuration
 
+If you skipped the optional steps during setup, you can run them later:
+
+**Configure Keycloak for Replit** (required for dev mode login):
+```bash
+make keycloak
+```
+Requires `KEYCLOAK_ADMIN_USER` and `KEYCLOAK_ADMIN_PASSWORD` secrets.
+
+**Provision Test Users** (creates alice, bob, etc.):
 ```bash
 make users
 ```
 
-This creates seed users (alice, bob, eve, etc.) with password `password123456`.
-
-### 5. Configure Keycloak for Replit
-
-Use the **🔑 Configure Keycloak** workflow or run:
-
+**Check Environment Setup**:
 ```bash
-make keycloak
+make preflight
 ```
-
-This configures Keycloak to:
-- Allow redirect URIs from Replit domains
-- Enable iframe embedding for the Replit preview
-
-### 6. Start Developing
-
-Click the **Run** button or use the **▶️ Start Dev Server** workflow!
 
 ## 📁 Project Structure
 
@@ -175,14 +160,16 @@ Use the workflows in Replit's **Tools** panel for a guided experience:
 
 | Command | Description |
 |---------|-------------|
-| `make setup` | Full setup (env, CLI, deps, deploy, client) |
+| `make setup` | **Interactive** full setup with login and optional steps |
+| `make setup-quick` | Non-interactive setup (use if already logged in) |
+| `make preflight` | Check if environment is correctly configured |
 | `make login` | Login to Noumena Cloud |
 | `make deploy` | Deploy both NPL and frontend |
 | `make deploy-npl` | Deploy NPL protocols only |
 | `make deploy-frontend` | Deploy frontend only |
 | `make client` | Generate TypeScript API client |
 | `make users` | Provision test users in Keycloak |
-| `make keycloak` | Configure Keycloak for Replit |
+| `make keycloak` | Configure Keycloak for Replit (enables dev mode) |
 | `make check` | Validate NPL code |
 | `make test` | Run NPL tests |
 | `make run` | Start the frontend dev server |
@@ -419,6 +406,28 @@ This template is designed to work with Replit Agent. The agent should:
 3. **Use `@actions` array** - Shows what the current user can do on each protocol instance
 
 The `replit.md` file contains workflow instructions. The comprehensive NPL documentation is in `docs/NPL_DEVELOPMENT.md` to prevent accidental overwriting.
+
+## 🔧 Troubleshooting
+
+### "Connecting to Noumena Cloud..." hangs forever
+**Cause:** Keycloak CSP blocking iframe embedding  
+**Solution:** Run `make keycloak` to update CSP settings, then restart the dev server.
+
+### "Please login again" error during deploy
+**Cause:** NPL CLI session expired  
+**Solution:** Run `make login` or `npl cloud login`
+
+### "Not logged in" error when running make setup
+**Cause:** The interactive setup will prompt you to login - just follow the prompts.  
+**Alternative:** Run `make install` first, then `make login`, then `make setup-quick`.
+
+### Actions not showing on protocol cards
+**Cause:** User doesn't have permission for those actions  
+**Solution:** Check your NPL protocol permissions match the logged-in user's party claims.
+
+### Login form shows but authentication fails
+**Cause:** Direct Access Grants not enabled on Keycloak client  
+**Solution:** Run `make keycloak` to enable Direct Access Grants for dev mode.
 
 ## 📚 Resources
 
