@@ -14,9 +14,11 @@ channel = "stable-25_05"
 PATH = "/home/runner/.npl/bin:/home/runner/.npl/lsp:${PATH}"
 
 # NPL Language configuration
+# Note: Syntax highlighting not available - Replit doesn't support custom grammars
+# and NPL Language Server doesn't provide semantic tokens yet.
+# The LSP still provides error diagnostics.
 [languages.npl]
 pattern = "**/*.npl"
-syntax = ".replit-config/syntaxes/npl.tmLanguage.json"
 rootPatterns = ["npl/src/main", "migration.yml"]
 
 [languages.npl.languageServer]
