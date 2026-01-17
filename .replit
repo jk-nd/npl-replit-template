@@ -1,6 +1,10 @@
 # NPL + React Replit Template
 # Build frontends on Replit that connect to Noumena Cloud
 
+# On boot: Quick check and install of basic tools (no login required)
+# Full setup with login: run 'make setup'
+onBoot = "make env install lsp 2>/dev/null || true"
+
 run = "cd frontend && npm run dev"
 entrypoint = "frontend/src/App.tsx"
 

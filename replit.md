@@ -2,12 +2,22 @@
 
 ## ⚠️ CRITICAL: Agent Instructions
 
-1. **Read NPL docs first**: `docs/NPL_DEVELOPMENT.md` contains all syntax and rules
-2. **Install language server**: Run `make lsp` for NPL syntax highlighting and error detection
-3. **Delete the demo package**: After successfully building your own NPL code, delete `npl/src/main/npl-1.0/demo/` - it's only an example
-4. **Clean before deploy**: Always run `make clean` before deploying to ensure fresh build
-5. **Update the app title**: Change the page title in `frontend/index.html` from "NPL + React" to the app name
-6. **Do NOT modify this file**: This file contains agent instructions and should not be edited
+1. **Run `make setup` first**: This is the first thing to do. It will:
+   - Install NPL CLI, language server, and npm dependencies
+   - Open a browser for Noumena Cloud login (user must authenticate)
+   - Deploy NPL backend and generate API client
+   - Prompt for optional Keycloak and test user configuration
+2. **Read NPL docs**: `docs/NPL_DEVELOPMENT.md` contains all NPL syntax and rules
+3. **Delete the demo package**: After building your own NPL code, delete `npl/src/main/npl-1.0/demo/`
+4. **Clean before deploy**: Run `make clean` before deploying to ensure fresh build
+5. **Update the app title**: Change `frontend/index.html` title from "NPL + React" to your app name
+6. **Do NOT modify this file**: This file contains agent instructions
+
+### First-Time Setup
+```bash
+make setup
+```
+This interactive command handles everything. A browser will open for login - the user must complete authentication.
 
 ### Production Reminders
 - **Test users exist**: If `make users` was run, test users (alice, bob, etc.) with password `password123456` exist in Keycloak. Remind users to remove these for production.
