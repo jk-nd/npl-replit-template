@@ -39,7 +39,7 @@ help:
 	@echo "  KEYCLOAK_ADMIN_USER     - Keycloak admin username"
 	@echo "  KEYCLOAK_ADMIN_PASSWORD - Keycloak admin password"
 
-# Full setup (interactive - will prompt for login)
+# Full setup (interactive - will prompt for login and optional steps)
 setup: env install
 	@echo ""
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -53,13 +53,33 @@ setup: env install
 	@$(MAKE) deploy-npl client
 	@echo ""
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-	@echo "✅ Setup complete!"
+	@echo "✅ Core setup complete!"
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	@echo ""
-	@echo "Next steps:"
-	@echo "  1. Run 'make keycloak' to configure Keycloak for Replit"
-	@echo "  2. Run 'make users' to provision test users (optional)"
-	@echo "  3. Click 'Run' or use 'make run' to start the frontend"
+	@echo "📋 Optional configuration steps:"
+	@echo ""
+	@read -p "🔑 Configure Keycloak for Replit? (enables dev mode login) [y/N]: " keycloak_choice; \
+	if [ "$$keycloak_choice" = "y" ] || [ "$$keycloak_choice" = "Y" ]; then \
+		$(MAKE) keycloak; \
+	else \
+		echo "   Skipped. Run 'make keycloak' later if needed."; \
+	fi
+	@echo ""
+	@read -p "👥 Provision test users (alice, bob, etc.)? [y/N]: " users_choice; \
+	if [ "$$users_choice" = "y" ] || [ "$$users_choice" = "Y" ]; then \
+		$(MAKE) users; \
+	else \
+		echo "   Skipped. Run 'make users' later if needed."; \
+	fi
+	@echo ""
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "🎉 Setup complete! Ready to develop."
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo ""
+	@echo "Start the frontend with:"
+	@echo "  make run"
+	@echo ""
+	@echo "Or click the 'Run' button in Replit."
 
 # Quick setup (assumes already logged in)
 setup-quick: env install deploy-npl client
