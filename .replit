@@ -16,9 +16,10 @@ PATH = "/home/runner/.npl/bin:/home/runner/.npl/lsp:${PATH}"
 # NPL Language configuration
 [languages.npl]
 pattern = "**/*.npl"
+syntax = ".replit-config/syntaxes/npl.tmLanguage.json"
 
 [languages.npl.languageServer]
-start = "/home/runner/.npl/lsp/language-server"
+start = "/home/runner/.npl/lsp/language-server --stdio"
 
 [[ports]]
 localPort = 5000
