@@ -16,6 +16,7 @@ frontend/src/generated/
 # IDE
 .idea/
 .vscode/
+.cursorrules
 *.swp
 *.swo
 
