@@ -55,7 +55,8 @@ VITE_KEYCLOAK_REALM=$KEYCLOAK_REALM
 VITE_KEYCLOAK_CLIENT_ID=$KEYCLOAK_CLIENT_ID
 
 # Set to 'true' to use direct OIDC HTTP calls instead of Keycloak library
-VITE_DEV_MODE=false
+# Recommended for Replit development (bypasses iframe auth issues)
+VITE_DEV_MODE=true
 
 # Set to 'true' to use proxy endpoints (for local development)
 VITE_USE_PROXY=false

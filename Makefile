@@ -1,7 +1,7 @@
 # NPL + React Replit Template Makefile
 # Alternative to workflow buttons for those who prefer make
 
-.PHONY: help setup env install deploy deploy-npl deploy-frontend client users keycloak run build clean
+.PHONY: help setup env install deploy deploy-npl deploy-frontend client users keycloak run build clean login preflight
 
 # Default target
 help:
@@ -25,6 +25,10 @@ help:
 	@echo "  build      - Build for production"
 	@echo "  check      - Validate NPL code"
 	@echo "  test       - Run NPL tests"
+	@echo ""
+	@echo "Utility targets:"
+	@echo "  login      - Login to Noumena Cloud"
+	@echo "  preflight  - Run pre-flight checks"
 	@echo ""
 	@echo "Required environment variables:"
 	@echo "  NPL_TENANT          - Your Noumena Cloud tenant"
@@ -93,3 +97,13 @@ test:
 clean:
 	@rm -rf frontend/node_modules frontend/dist frontend/src/generated .env
 	@echo "Cleaned generated files"
+
+# Login to Noumena Cloud
+login:
+	@echo "🔐 Logging in to Noumena Cloud..."
+	@echo "   This will open a browser window for authentication."
+	@export PATH="$$HOME/.npl/bin:$$PATH" && npl cloud login
+
+# Run pre-flight checks
+preflight:
+	@./scripts/preflight-check.sh

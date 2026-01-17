@@ -83,8 +83,8 @@ echo ""
 # Define the URIs we want to add
 # - localhost for local development
 # - Various Replit URL patterns (they use different subdomains)
-NEW_REDIRECT_URIS='["http://localhost:5173/*", "https://*.replit.dev/*", "https://*.worf.replit.dev/*", "https://*.picard.replit.dev/*", "https://*.kirk.replit.dev/*", "https://*.repl.co/*"]'
-NEW_WEB_ORIGINS='["http://localhost:5173", "https://*.replit.dev", "https://*.worf.replit.dev", "https://*.picard.replit.dev", "https://*.kirk.replit.dev", "https://*.repl.co"]'
+NEW_REDIRECT_URIS='["http://localhost:5000/*", "http://localhost:5173/*", "https://*.replit.dev/*", "https://*.worf.replit.dev/*", "https://*.picard.replit.dev/*", "https://*.kirk.replit.dev/*", "https://*.riker.replit.dev/*", "https://*.repl.co/*", "https://*.noumena.cloud/*"]'
+NEW_WEB_ORIGINS='["http://localhost:5000", "http://localhost:5173", "https://*.replit.dev", "https://*.worf.replit.dev", "https://*.picard.replit.dev", "https://*.kirk.replit.dev", "https://*.riker.replit.dev", "https://*.repl.co", "https://*.noumena.cloud"]'
 
 # Auto-detect Replit URL using available environment variables
 DETECTED_REPLIT_HOST=""
@@ -174,8 +174,8 @@ REALM_CONFIG=$(curl -s -X GET "${KEYCLOAK_URL}/admin/realms/${REALM}" \
 # Set Content-Security-Policy frame-ancestors to allow Replit domains
 # IMPORTANT: Must include replit.com (the main UI) AND replit.dev (the preview)
 
-# Base CSP with all Replit patterns
-CSP_FRAME_ANCESTORS="'self' https://replit.com https://*.replit.com https://*.replit.dev https://*.worf.replit.dev https://*.picard.replit.dev https://*.kirk.replit.dev https://*.repl.co http://localhost:*"
+# Base CSP with all Replit patterns + Noumena Cloud (for deployed frontends)
+CSP_FRAME_ANCESTORS="'self' https://replit.com https://*.replit.com https://*.replit.dev https://*.worf.replit.dev https://*.picard.replit.dev https://*.kirk.replit.dev https://*.riker.replit.dev https://*.repl.co http://localhost:* https://*.noumena.cloud"
 
 # Add specific detected Replit host if available (wildcards don't always match)
 if [ -n "$DETECTED_REPLIT_HOST" ]; then

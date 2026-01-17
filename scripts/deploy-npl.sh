@@ -8,6 +8,16 @@ echo "☁️  Deploying NPL protocols to Noumena Cloud..."
 # Ensure NPL CLI is in PATH
 export PATH="$HOME/.npl/bin:$PATH"
 
+# Check if logged in before attempting deploy
+if ! npl cloud status &>/dev/null; then
+    echo "❌ Not logged in to Noumena Cloud"
+    echo ""
+    echo "   Please run: make login"
+    echo "   Or:         npl cloud login"
+    echo ""
+    exit 1
+fi
+
 # Source .env if it exists
 if [ -f .env ]; then
     export $(grep -v '^#' .env | xargs)
