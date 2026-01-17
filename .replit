@@ -11,7 +11,14 @@ modules = ["nodejs-20", "bash", "web"]
 channel = "stable-25_05"
 
 [env]
-PATH = "/home/runner/.npl/bin:${PATH}"
+PATH = "/home/runner/.npl/bin:/home/runner/.npl/lsp:${PATH}"
+
+# NPL Language configuration
+[languages.npl]
+pattern = "**/*.npl"
+
+[languages.npl.languageServer]
+start = "/home/runner/.npl/lsp/language-server"
 
 [[ports]]
 localPort = 5000
@@ -142,6 +149,15 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "make clean"
+
+[[workflows.workflow]]
+name = "🎨 Install Language Server"
+mode = "sequential"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "make lsp"
 
 [agent]
 expertMode = true

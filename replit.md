@@ -3,10 +3,11 @@
 ## ⚠️ CRITICAL: Agent Instructions
 
 1. **Read NPL docs first**: `docs/NPL_DEVELOPMENT.md` contains all syntax and rules
-2. **Delete the demo package**: After successfully building your own NPL code, delete `npl/src/main/npl-1.0/demo/` - it's only an example
-3. **Clean before deploy**: Always run `make clean` before deploying to ensure fresh build
-4. **Update the app title**: Change the page title in `frontend/index.html` from "NPL + React" to the app name
-5. **Do NOT modify this file**: This file contains agent instructions and should not be edited
+2. **Install language server**: Run `make lsp` for NPL syntax highlighting and error detection
+3. **Delete the demo package**: After successfully building your own NPL code, delete `npl/src/main/npl-1.0/demo/` - it's only an example
+4. **Clean before deploy**: Always run `make clean` before deploying to ensure fresh build
+5. **Update the app title**: Change the page title in `frontend/index.html` from "NPL + React" to the app name
+6. **Do NOT modify this file**: This file contains agent instructions and should not be edited
 
 ### Production Reminders
 - **Test users exist**: If `make users` was run, test users (alice, bob, etc.) with password `password123456` exist in Keycloak. Remind users to remove these for production.
@@ -127,6 +128,7 @@ if (instance["@actions"].includes("approve")) {
 | `make users` | Create test users (alice, bob, etc.) |
 | `make keycloak` | Configure Keycloak for Replit (enables dev mode) |
 | `make add-redirect URL=<url>` | Add redirect URI for external hosting |
+| `make lsp` | Install NPL Language Server (syntax highlighting) |
 | `make run` | Start frontend dev server |
 
 ---

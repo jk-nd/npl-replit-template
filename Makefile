@@ -1,7 +1,7 @@
 # NPL + React Replit Template Makefile
 # Alternative to workflow buttons for those who prefer make
 
-.PHONY: help setup setup-quick env install deploy deploy-npl deploy-frontend client users keycloak add-redirect run build clean login preflight
+.PHONY: help setup setup-quick env install deploy deploy-npl deploy-frontend client users keycloak add-redirect run build clean login preflight lsp
 
 # Default target
 help:
@@ -31,6 +31,7 @@ help:
 	@echo "  login      - Login to Noumena Cloud"
 	@echo "  preflight  - Run pre-flight checks"
 	@echo "  add-redirect URL=<url> - Add custom redirect URI for external hosting"
+	@echo "  lsp        - Install NPL Language Server (syntax highlighting)"
 	@echo ""
 	@echo "Required environment variables:"
 	@echo "  NPL_TENANT          - Your Noumena Cloud tenant"
@@ -150,6 +151,10 @@ test:
 clean:
 	@rm -rf frontend/node_modules frontend/dist frontend/src/generated .env
 	@echo "Cleaned generated files"
+
+# Install NPL Language Server for syntax highlighting
+lsp:
+	@./scripts/install-language-server.sh
 
 # Login to Noumena Cloud
 login:
