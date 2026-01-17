@@ -169,6 +169,7 @@ Use the workflows in Replit's **Tools** panel for a guided experience:
 | `make client` | Generate TypeScript API client |
 | `make users` | Provision test users in Keycloak |
 | `make keycloak` | Configure Keycloak for Replit (enables dev mode) |
+| `make add-redirect URL=<url>` | Add redirect URI for external hosting |
 | `make check` | Validate NPL code |
 | `make test` | Run NPL tests |
 | `make run` | Start the frontend dev server |
@@ -405,6 +406,57 @@ This template is designed to work with Replit Agent. The agent should:
 3. **Use `@actions` array** - Shows what the current user can do on each protocol instance
 
 The `replit.md` file contains workflow instructions. The comprehensive NPL documentation is in `docs/NPL_DEVELOPMENT.md` to prevent accidental overwriting.
+
+## 🚀 Deployment Options
+
+### Option 1: Deploy to Noumena Cloud ⭐ Recommended
+
+**This is the easiest and recommended approach.** Deploy your frontend alongside your NPL backend on Noumena Cloud:
+
+```bash
+make deploy
+```
+
+**Why choose Noumena Cloud?**
+- ✅ **Zero configuration** - No Keycloak changes needed (same domain)
+- ✅ **Production-ready** - Uses standard OAuth2 redirect flow
+- ✅ **Single command** - Deploys both NPL and frontend together
+- ✅ **Integrated** - View everything in the Noumena Cloud Portal
+
+After deployment, your app is available at:
+```
+https://app-{tenant}-{app}.noumena.cloud
+```
+
+### Option 2: Publish on Replit
+
+If you prefer to host your frontend on Replit (e.g., for demo purposes or custom domain), additional configuration is required:
+
+1. **Build for production:**
+   ```bash
+   make build
+   ```
+
+2. **Publish your Replit app** and get the URL (e.g., `https://my-app--username.replit.app`)
+
+3. **Add the redirect URI to Keycloak:**
+   ```bash
+   make add-redirect URL=https://my-app--username.replit.app
+   ```
+
+4. **Create production environment:**
+   - Copy `env.production.template` to `.env.production` in the root directory
+   - Update with your actual tenant/app values
+   - Set `VITE_DEV_MODE=false`
+
+> **⚠️ Note:** Each Replit published URL must be added explicitly. Keycloak wildcards only work for paths, not hostnames.
+
+### Environment Modes
+
+| Mode | `VITE_DEV_MODE` | Use Case |
+|------|-----------------|----------|
+| Development | `true` | Replit preview (iframe restrictions require direct OIDC) |
+| Production | `false` | Noumena Cloud or published Replit app |
 
 ## 🔧 Troubleshooting
 

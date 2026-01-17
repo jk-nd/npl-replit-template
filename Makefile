@@ -1,7 +1,7 @@
 # NPL + React Replit Template Makefile
 # Alternative to workflow buttons for those who prefer make
 
-.PHONY: help setup setup-quick env install deploy deploy-npl deploy-frontend client users keycloak run build clean login preflight
+.PHONY: help setup setup-quick env install deploy deploy-npl deploy-frontend client users keycloak add-redirect run build clean login preflight
 
 # Default target
 help:
@@ -30,6 +30,7 @@ help:
 	@echo "Utility targets:"
 	@echo "  login      - Login to Noumena Cloud"
 	@echo "  preflight  - Run pre-flight checks"
+	@echo "  add-redirect URL=<url> - Add custom redirect URI for external hosting"
 	@echo ""
 	@echo "Required environment variables:"
 	@echo "  NPL_TENANT          - Your Noumena Cloud tenant"
@@ -115,6 +116,15 @@ users:
 # Configure Keycloak client (add redirect URIs)
 keycloak:
 	@./scripts/configure-keycloak-client.sh
+
+# Add custom redirect URI for external hosting (e.g., Replit published app)
+# Usage: make add-redirect URL=https://your-app.replit.app
+add-redirect:
+ifndef URL
+	@echo "Usage: make add-redirect URL=https://your-app.replit.app"
+	@exit 1
+endif
+	@./scripts/add-redirect-uri.sh $(URL)
 
 # Start development server
 run:

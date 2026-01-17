@@ -1,6 +1,20 @@
 # NPL + React Replit Template
 
-## CRITICAL: Read NPL Documentation First
+## ⚠️ CRITICAL: Agent Instructions
+
+1. **Read NPL docs first**: `docs/NPL_DEVELOPMENT.md` contains all syntax and rules
+2. **Delete the demo package**: After successfully building your own NPL code, delete `npl/src/main/npl-1.0/demo/` - it's only an example
+3. **Clean before deploy**: Always run `make clean` before deploying to ensure fresh build
+4. **Update the app title**: Change the page title in `frontend/index.html` from "NPL + React" to the app name
+5. **Do NOT modify this file**: This file contains agent instructions and should not be edited
+
+### Production Reminders
+- **Test users exist**: If `make users` was run, test users (alice, bob, etc.) with password `password123456` exist in Keycloak. Remind users to remove these for production.
+- **Keycloak realm title**: The login page title shows the realm name (NPL_APP). This can be customized in Keycloak admin console under Realm Settings > Themes.
+
+---
+
+## Read NPL Documentation First
 
 **Before writing ANY code, you MUST read the NPL development guide:**
 
@@ -29,19 +43,29 @@ Before writing code, understand what the user wants to build:
 **Do the backend FIRST. The frontend depends on it.**
 
 1. **Read the NPL reference**: `docs/NPL_DEVELOPMENT.md`
-2. **Design your protocols** in `npl/src/main/npl-1.0/{package}/`
-3. **Check your code**: `make check`
-4. **Deploy to Noumena Cloud**: `make deploy`
-5. **Regenerate the TypeScript client**: `make client`
+2. **Create a new package** in `npl/src/main/npl-1.0/{your_package}/`
+3. **Design your protocols** in your new package
+4. **Validate your code**: `make check`
+5. **Run tests** (if any): `make test`
+6. **Delete the demo package**: After your code builds successfully, delete `npl/src/main/npl-1.0/demo/` (contains example IOU protocol)
+7. **Clean and deploy**: `make clean && make deploy-npl`
+8. **Regenerate the TypeScript client**: `make client`
+
+**⚠️ IMPORTANT:** Always delete the demo IOU protocol (`npl/src/main/npl-1.0/demo/`) before deploying your own application. It's only there as a reference example.
 
 ### Step 3: Build the Frontend
 
 **Only after the backend is deployed:**
 
-1. **Check the generated types** in `src/generated/api-types.ts`
-2. **Use the `@actions` array** to know what the user can do
-3. **Build UI components** that match the protocol's states and permissions
-4. **Test with provisioned users**: `make users` creates test accounts
+1. **Regenerate the API client**: `make client` (creates types for your new package)
+2. **Update the frontend to use your package**:
+   - Update `frontend/src/api/client.ts` - change `demo` to your package name
+   - Update `frontend/src/api/types.ts` - import from your generated types
+   - Update or replace the components in `frontend/src/components/` to match your protocols
+3. **Use the `@actions` array** from API responses to show available actions
+4. **Test with provisioned users**: `make users` creates test accounts (alice, bob, etc.)
+
+**⚠️ The existing frontend (`IouCard`, `Dashboard`, etc.) is built for the demo IOU protocol. You MUST update it for your own protocols.**
 
 ---
 
@@ -102,9 +126,35 @@ if (instance["@actions"].includes("approve")) {
 | `make client` | Generate TypeScript client |
 | `make users` | Create test users (alice, bob, etc.) |
 | `make keycloak` | Configure Keycloak for Replit (enables dev mode) |
+| `make add-redirect URL=<url>` | Add redirect URI for external hosting |
 | `make run` | Start frontend dev server |
 
 ---
+
+## Deployment
+
+### Recommended: Deploy to Noumena Cloud
+
+```bash
+make deploy
+```
+
+This deploys both NPL and frontend to Noumena Cloud. **No extra configuration needed.**
+
+Your app will be at: `https://app-{tenant}-{app}.noumena.cloud`
+
+**Before production deployment:**
+- Update `frontend/index.html` title to your app name
+- As user whether user wants to remove test users from Keycloak if `make users` was run (alice, bob, etc. have weak passwords)
+
+### Alternative: Publish on Replit
+
+If you want to use Replit's publishing instead:
+
+1. `make build`
+2. Publish and get the URL
+3. `make add-redirect URL=https://your-app.replit.app`
+4. Create `.env.production` with `VITE_DEV_MODE=false`
 
 ---
 
