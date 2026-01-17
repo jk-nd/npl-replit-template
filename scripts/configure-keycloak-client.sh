@@ -146,16 +146,19 @@ echo "   Web Origins:   $MERGED_ORIGINS"
 echo ""
 
 # Update the client
+# Enable Direct Access Grants for password-based login (required for dev mode in Replit)
+# This is less secure than authorization code flow but necessary when iframes break standard auth
+echo "🔓 Enabling Direct Access Grants for dev mode..."
 RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT "${KEYCLOAK_URL}/admin/realms/${REALM}/clients/${CLIENT_UUID}" \
     -H "Authorization: Bearer ${ADMIN_TOKEN}" \
     -H "Content-Type: application/json" \
     -d "$(echo "$CLIENT_CONFIG" | jq --argjson redirects "$MERGED_REDIRECTS" --argjson origins "$MERGED_ORIGINS" \
-        '.redirectUris = $redirects | .webOrigins = $origins')")
+        '.redirectUris = $redirects | .webOrigins = $origins | .directAccessGrantsEnabled = true')")
 
 HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
 
 if [ "$HTTP_CODE" == "204" ]; then
-    echo "✅ Client redirect URIs updated"
+    echo "✅ Client updated (redirect URIs + Direct Access Grants enabled)"
 else
     echo "❌ Failed to update client (HTTP $HTTP_CODE)"
     echo "$RESPONSE" | head -n-1
@@ -208,7 +211,10 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "✅ Keycloak client configured successfully!"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "📝 The following redirect URIs are now allowed:"
-echo "   • http://localhost:5173/* (local development)"
-echo "   • https://*.replit.dev/*  (Replit deployments)"
-echo "   • https://*.repl.co/*     (Replit legacy URLs)"
+echo "📝 Configuration applied:"
+echo "   • Redirect URIs: localhost:5000, localhost:5173, *.replit.dev, *.noumena.cloud"
+echo "   • Direct Access Grants: ENABLED (for dev mode password login)"
+echo "   • Iframe embedding: ENABLED (for Replit webview)"
+echo ""
+echo "⚠️  Note: Direct Access Grants is less secure than standard OAuth flow."
+echo "   This is acceptable for development but should be disabled in production."
