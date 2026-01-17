@@ -42,7 +42,7 @@ help:
 	@echo "  KEYCLOAK_ADMIN_PASSWORD - Keycloak admin password"
 
 # Full setup (interactive - will prompt for login and optional steps)
-setup: env install
+setup: env install lsp
 	@echo ""
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	@echo "📦 Dependencies installed! Now you need to login."
@@ -84,7 +84,7 @@ setup: env install
 	@echo "Or click the 'Run' button in Replit."
 
 # Quick setup (assumes already logged in)
-setup-quick: env install deploy-npl client
+setup-quick: env install lsp deploy-npl client
 	@echo ""
 	@echo "✅ Setup complete! Use 'make run' to start the frontend."
 
