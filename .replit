@@ -17,6 +17,7 @@ PATH = "/home/runner/.npl/bin:/home/runner/.npl/lsp:${PATH}"
 [languages.npl]
 pattern = "**/*.npl"
 syntax = ".replit-config/syntaxes/npl.tmLanguage.json"
+rootPatterns = ["npl/src/main", "migration.yml"]
 
 [languages.npl.languageServer]
 start = "/home/runner/.npl/lsp/language-server --stdio"
