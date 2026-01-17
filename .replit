@@ -5,7 +5,8 @@
 # Full setup: run 'make setup' (configures env, prompts for login)
 onBoot = "make install lsp 2>/dev/null || true"
 
-run = "cd frontend && npm run dev"
+# Run command checks for setup first
+run = "make run"
 entrypoint = "frontend/src/App.tsx"
 
 hidden = [".config", "node_modules", ".git", "dist"]
