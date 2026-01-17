@@ -21,6 +21,25 @@ This interactive command handles everything. A browser will open for login - the
 
 ---
 
+## 🚨 NPL Syntax Quick Reference (MUST READ)
+
+These are the **most common mistakes**. Memorize them before writing NPL:
+
+| Rule | Example |
+|------|---------|
+| **Semicolons after EVERYTHING** | `if (x) { return y; };` ← note semicolon after `}` |
+| **Text, not String** | `var name: Text = "hello";` |
+| **No null** | Use `Optional<T>` and `getOrElse()` |
+| **No ternary operator** | Use `if-else` instead of `? :` |
+| **Use `npl check` not LSP** | LSP only shows basic errors; `make check` validates fully |
+| **Clear before deploy** | `npl cloud clear` then `make deploy-npl` |
+| **Regenerate client** | After NPL changes: `make client` |
+| **Use `@actions` for UI** | Don't check emails/roles manually |
+
+**Full reference**: `docs/NPL_DEVELOPMENT.md`
+
+---
+
 ## ⚠️ Common Pitfalls
 
 ### 1. Production Build: VITE_DEV_MODE must be false
@@ -40,13 +59,19 @@ const client = createApiClient(token);
 const client = useMemo(() => createApiClient(token), [token]);
 ```
 
-### 3. Protocol Migration: Clear before deploy
-If you change protocol structure (rename, add/remove fields), clear old definitions first:
+### 3. Clear before deploy (recommended)
+**Always clear when changing NPL code** - this applies to:
+- Adding new protocols
+- Renaming protocols or fields
+- Adding/removing fields
+- Changing field types
+
 ```bash
 npl cloud clear --tenant $NPL_TENANT --app $NPL_APP
 make deploy-npl
 ```
-Old protocol definitions can conflict with new ones.
+
+**Why?** The NPL Engine caches protocol definitions. Old definitions can conflict with new ones, causing deployment failures or runtime errors. When in doubt, clear first.
 
 ### 4. Environment Variable Priority
 - `.env` → Used for development

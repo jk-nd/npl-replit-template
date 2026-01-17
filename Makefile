@@ -1,7 +1,7 @@
 # NPL + React Replit Template Makefile
 # Alternative to workflow buttons for those who prefer make
 
-.PHONY: help setup setup-quick env install deploy deploy-npl deploy-frontend client users keycloak add-redirect run build clean login preflight lsp
+.PHONY: help setup setup-quick env install check-setup deploy deploy-npl deploy-npl-clean deploy-frontend client users keycloak add-redirect run build clean login preflight lsp
 
 # Default target
 help:
@@ -16,6 +16,7 @@ help:
 	@echo "  install    - Install NPL CLI and npm dependencies"
 	@echo "  deploy     - Deploy both NPL and frontend to Noumena Cloud"
 	@echo "  deploy-npl - Deploy NPL protocols to Noumena Cloud"
+	@echo "  deploy-npl-clean - Clear and deploy NPL (use when changing protocols)"
 	@echo "  deploy-frontend - Deploy frontend to Noumena Cloud"
 	@echo "  client     - Generate TypeScript API client from OpenAPI"
 	@echo "  users      - Provision seed users in Keycloak"
@@ -97,14 +98,36 @@ install:
 	@./scripts/install-npl-cli.sh
 	@cd frontend && npm install
 
+# Check that setup has been run
+check-setup:
+	@if [ ! -f .env ]; then \
+		echo ""; \
+		echo "❌ Error: .env file not found!"; \
+		echo ""; \
+		echo "You must run 'make setup' first to configure the environment."; \
+		echo "This creates the .env file with Keycloak and NPL Engine URLs."; \
+		echo ""; \
+		exit 1; \
+	fi
+
 # Deploy both NPL and frontend
-deploy: deploy-npl build deploy-frontend
+deploy: check-setup deploy-npl build deploy-frontend
 	@echo ""
 	@echo "✅ Full deployment complete!"
 
 # Deploy NPL to Noumena Cloud
-deploy-npl:
+deploy-npl: check-setup
 	@./scripts/deploy-npl.sh
+	@echo ""
+	@echo "💡 Don't forget: run 'make client' to regenerate TypeScript types!"
+
+# Deploy NPL with clear (recommended when changing protocols)
+deploy-npl-clean: check-setup
+	@echo "🧹 Clearing existing protocols..."
+	@export PATH="$$HOME/.npl/bin:$$PATH" && npl cloud clear --tenant $$NPL_TENANT --app $$NPL_APP
+	@./scripts/deploy-npl.sh
+	@echo ""
+	@echo "💡 Don't forget: run 'make client' to regenerate TypeScript types!"
 
 # Generate TypeScript client
 client:
@@ -128,11 +151,11 @@ endif
 	@./scripts/add-redirect-uri.sh $(URL)
 
 # Start development server
-run:
+run: check-setup
 	@cd frontend && npm run dev
 
 # Build for production
-build:
+build: check-setup
 	@echo "🏗️  Building frontend for production (VITE_DEV_MODE=false)..."
 	@cd frontend && VITE_DEV_MODE=false npm run build
 

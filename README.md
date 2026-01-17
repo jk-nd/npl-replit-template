@@ -477,12 +477,14 @@ const client = useMemo(() => createApiClient(token), [token]);
 ```
 
 ### Protocol changes not reflecting after deploy
-**Cause:** Old protocol definitions conflicting with new ones  
+**Cause:** Old protocol definitions cached in the NPL Engine  
+**Applies to:** Adding new protocols, renaming, adding/removing fields, changing types  
 **Solution:** Clear and redeploy:
 ```bash
 npl cloud clear --tenant $NPL_TENANT --app $NPL_APP
 make deploy-npl
 ```
+**Tip:** When in doubt, always clear before deploying NPL changes.
 
 ### Production build still uses dev mode auth
 **Cause:** `.env` settings not overriding in production  
