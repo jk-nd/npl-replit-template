@@ -1,3 +1,20 @@
+# ============================================================
+# 🛑 STOP - AGENT INSTRUCTIONS
+# ============================================================
+# This is an NPL + React project that requires setup BEFORE running.
+#
+# DO NOT:
+# - Run npm commands directly
+# - Start the dev server
+# - Edit vite.config.ts or .replit
+# - Modify workflows
+#
+# FIRST STEP: Run 'make setup' in the terminal
+# This configures Noumena Cloud connection and prompts for login.
+#
+# READ: replit.md for full instructions
+# ============================================================
+
 { pkgs }: {
   deps = [
     # Node.js for React frontend

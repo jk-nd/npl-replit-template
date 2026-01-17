@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "description": "⚠️ AGENT: Run 'make setup' first! Do NOT run npm commands directly. See replit.md for instructions.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
