@@ -231,6 +231,48 @@ function IouCard({ iou }) {
 }
 ```
 
+### Using @actions for Role Detection (Admin vs User Views)
+
+Beyond button visibility, use `@actions` to determine **which UI sections** to show:
+
+```typescript
+// A registry protocol might have admin-only actions
+// @actions: ["registerUser"] for admins
+// @actions: [] for regular users
+
+function RegistryPage({ registry }) {
+  // Detect if current user is an admin by checking for admin-only actions
+  const isAdmin = registry["@actions"].includes("getUserCount") || 
+                  registry["@actions"].includes("unregisterUser");
+  
+  return (
+    <div>
+      {/* Everyone sees the main content */}
+      <h1>User Registry</h1>
+      
+      {/* Only admins see the admin panel */}
+      {isAdmin && (
+        <div className="admin-panel">
+          <h2>Admin Tools</h2>
+          <button onClick={handleExportUsers}>Export Users</button>
+          <button onClick={handleViewStats}>View Statistics</button>
+        </div>
+      )}
+      
+      {/* Show registration button only if available */}
+      {registry["@actions"].includes("registerUser") && (
+        <button onClick={handleRegister}>Register</button>
+      )}
+    </div>
+  );
+}
+```
+
+**Key insight**: The `@actions` array tells you everything about what the current user can do. Use it to:
+- Show/hide entire sections (admin panels, settings pages)
+- Enable/disable navigation items
+- Customize the UI based on user capabilities
+
 ---
 
 ## 4. Test Users and Their Claims
@@ -575,6 +617,104 @@ Match your protocol's permission names:
 
 ---
 
+## 9. The Bootstrap Problem
+
+When using the **observers pattern** (dynamic party access), you face a chicken-and-egg problem:
+
+> **Problem**: The first admin can't access the UI to create a registry because the registry doesn't exist yet!
+
+### The Issue
+
+1. Your protocol has a `shop` party that can create registries
+2. Users must register to see anything
+3. But someone needs to create the registry first
+4. The UI only shows things the user can access via API
+5. **Before any registry exists, there's nothing to show**
+
+### Solutions
+
+#### Option 1: Bootstrap via Noumena Portal API (Recommended)
+
+Use the Portal's Swagger UI to create the initial instance:
+
+1. Go to `https://engine-{tenant}-{app}.noumena.cloud/swagger-ui/index.html`
+2. Authenticate with admin credentials
+3. POST to `/npl/{package}/YourRegistry/` to create the initial instance
+4. Now the frontend will show the registry
+
+#### Option 2: Bootstrap Script
+
+Create a script that runs after deployment to initialize required data:
+
+```bash
+# scripts/bootstrap.sh
+#!/bin/bash
+# Create initial registry instance via API
+
+ENGINE_URL="https://engine-${NPL_TENANT}-${NPL_APP}.noumena.cloud"
+PACKAGE="bikeshop"
+
+# Get admin token (requires admin credentials)
+TOKEN=$(curl -s -X POST "${KEYCLOAK_URL}/realms/${NPL_APP}/protocol/openid-connect/token" \
+  -d "client_id=${NPL_APP}" \
+  -d "username=${ADMIN_USER}" \
+  -d "password=${ADMIN_PASSWORD}" \
+  -d "grant_type=password" | jq -r '.access_token')
+
+# Create the registry
+curl -X POST "${ENGINE_URL}/npl/${PACKAGE}/UserRegistry/" \
+  -H "Authorization: Bearer ${TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "@parties": {
+      "shop": { "claims": { "email": ["admin@example.com"] } }
+    }
+  }'
+
+echo "✅ Registry bootstrapped!"
+```
+
+#### Option 3: Frontend Bootstrap Page
+
+Add a special bootstrap page that only appears when no instances exist:
+
+```typescript
+function App() {
+  const [registryExists, setRegistryExists] = useState<boolean | null>(null);
+  
+  useEffect(() => {
+    // Check if registry exists
+    checkRegistryExists().then(setRegistryExists);
+  }, []);
+  
+  if (registryExists === null) return <Loading />;
+  
+  // Show bootstrap UI if no registry exists
+  if (!registryExists) {
+    return <BootstrapPage onCreated={() => setRegistryExists(true)} />;
+  }
+  
+  return <MainApp />;
+}
+```
+
+### Best Practice
+
+Document the bootstrap requirement in your deployment instructions:
+
+```markdown
+## First-Time Deployment
+
+After `make deploy-npl`, create the initial registry:
+
+1. Open Swagger UI: https://engine-{tenant}-{app}.noumena.cloud/swagger-ui
+2. Authenticate with admin credentials
+3. Create the UserRegistry instance
+4. Users can now register and use the app
+```
+
+---
+
 ## Summary
 
 1. **Authorization = Party Claims** - Users are matched to parties via JWT claims (email)
@@ -583,3 +723,4 @@ Match your protocol's permission names:
 4. **Memoize API client** - Avoid infinite re-render loops
 5. **Refresh after mutations** - Reload data after any action
 6. **Update imports** - When changing packages, update all path references
+7. **Bootstrap first** - Create initial instances before users can access the app

@@ -529,6 +529,92 @@ protocol[issuer, recipient] Transfer() {
 };
 ```
 
+## Observers (Dynamic Party Access)
+
+**Observers** is a built-in protocol feature that grants API access to parties not defined in the protocol signature. This is useful for:
+- Registries where users can join dynamically
+- Multi-tenant protocols
+- Admin panels with dynamic membership
+
+> **Reference**: [Official NPL Observers Documentation](https://documentation.noumenadigital.com/language/reference/standard-library/types/user/Protocol/#observers)
+
+### How It Works
+
+Every protocol has a built-in `observers` field of type `Map<Text, Party>`. Parties added to this map gain **read access** to the protocol instance via API. Combined with the `*` party syntax, you can grant action permissions to dynamic parties.
+
+### Example: Dynamic User Registry
+
+```npl
+/**
+ * A registry where users can register themselves.
+ * The shop can see all users; users can see their own data.
+ */
+@api
+protocol[shop] UserRegistry() {
+    initial state active;
+    
+    // Built-in: private var observers: Map<Text, Party> = mapOf<Text, Party>();
+    
+    private var users: Map<Text, Text> = mapOf<Text, Text>(); // email -> displayName
+    
+    /**
+     * Register a new user. The *user syntax means any party can call this,
+     * and they are bound to the 'user' variable.
+     * @param email User's email (must match their JWT claim)
+     * @param displayName User's display name
+     */
+    @api
+    permission[*user & shop] registerUser(email: Text, displayName: Text) | active {
+        require(email.length() > 0, "Email required");
+        
+        // Add to user data
+        users = users.with(email, displayName);
+        
+        // Add to observers - this grants API access
+        observers = observers.with(email, user);
+    };
+    
+    /**
+     * Unregister a user (shop only)
+     */
+    @api
+    permission[shop] unregisterUser(email: Text) | active {
+        users = users.without(email);
+        observers = observers.without(email);
+    };
+    
+    /**
+     * Get user count (shop only)
+     */
+    @api
+    permission[shop] getUserCount() returns Number | active {
+        return users.size();
+    };
+}
+```
+
+### Key Concepts
+
+| Syntax | Meaning |
+|--------|---------|
+| `permission[*user]` | Any authenticated party can call; caller bound to `user` variable |
+| `permission[*user & shop]` | Any party OR the named `shop` party can call |
+| `observers.with(key, party)` | Adds party to observers → grants API read access |
+| `observers.without(key)` | Removes party from observers → revokes API access |
+
+### Important Distinctions
+
+- **`observers`**: Controls **who can see** the protocol instance via API (read access)
+- **`*` syntax**: Controls **who can invoke** specific permissions (action access)
+- **Named parties** (e.g., `shop`): Fixed parties defined in protocol signature
+
+### Frontend Implications
+
+When using observers:
+1. **Observers can query the protocol** via API - they see the instance in list queries
+2. **The `@actions` array** reflects what each user can do based on permissions
+3. **Use the named party** (e.g., `shop`) for initial bootstrap (see Bootstrap Problem below)
+
 ## Standard Library and Type System
 
 NPL has a defined standard library. **Never invent or assume the existence of methods that aren't documented.**

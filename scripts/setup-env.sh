@@ -63,8 +63,23 @@ VITE_USE_PROXY=false
 EOF
 
 echo "✅ Created .env file with Noumena Cloud configuration"
+
+# Verify the file was created
+if [ -f ".env" ]; then
+    echo ""
+    echo "📄 .env file contents:"
+    cat .env
+    echo ""
+else
+    echo "❌ Warning: .env file was not created!"
+fi
+
 echo ""
 echo "🔗 Useful links:"
 echo "   Portal:    https://portal.noumena.cloud/${NPL_TENANT}/${NPL_APP}"
 echo "   Swagger:   ${ENGINE_URL}/swagger-ui/index.html"
 echo "   Keycloak:  ${KEYCLOAK_URL}/admin/master/console"
+
+echo ""
+echo "⚠️  IMPORTANT: For production deployment, set VITE_DEV_MODE=false"
+echo "   Run: make build (sets VITE_DEV_MODE=false automatically)"

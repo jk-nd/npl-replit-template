@@ -51,7 +51,19 @@ Old protocol definitions can conflict with new ones.
 ### 4. Environment Variable Priority
 - `.env` → Used for development
 - Inline variables in scripts → Take priority over `.env`
-- For production builds, always set `VITE_DEV_MODE=false` directly in the build command
+- For production builds, `make build` automatically sets `VITE_DEV_MODE=false`
+
+### 5. Dev Server in Replit Does NOT Work with Production Mode
+**The Vite dev server (`make run`) only works with `VITE_DEV_MODE=true`.**
+
+When `VITE_DEV_MODE=false`, the Keycloak library uses iframe-based auth, which Replit's webview blocks with CSP errors:
+```
+Framing 'http://...' violates Content Security Policy directive: "frame-ancestors 'self'"
+```
+
+**Solution:** For testing in Replit's webview:
+1. Use `VITE_DEV_MODE=true` during development
+2. Run `make build && make deploy-frontend` to deploy to Noumena Cloud for production testing
 
 ### Production Reminders
 - **Test users exist**: If `make users` was run, test users (alice, bob, etc.) with password `password123456` exist in Keycloak. Remind users to remove these for production.

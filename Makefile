@@ -133,7 +133,8 @@ run:
 
 # Build for production
 build:
-	@cd frontend && npm run build
+	@echo "🏗️  Building frontend for production (VITE_DEV_MODE=false)..."
+	@cd frontend && VITE_DEV_MODE=false npm run build
 
 # Deploy frontend to Noumena Cloud
 deploy-frontend:
