@@ -36,6 +36,8 @@ externalPort = 80
 [deployment]
 run = ["sh", "-c", "cd frontend && npm run build && npm run preview"]
 
+# Replit allows max 10 workflows - keeping only essential ones
+# Use 'make <command>' directly for others (see: make help)
 [workflows]
 runButton = "🚀 Full Setup"
 
@@ -61,24 +63,6 @@ waitForPort = 5000
 outputType = "webview"
 
 [[workflows.workflow]]
-name = "⚙️ Generate Environment"
-mode = "sequential"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "make env"
-
-[[workflows.workflow]]
-name = "📦 Install Dependencies"
-mode = "sequential"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "make install"
-
-[[workflows.workflow]]
 name = "☁️ Deploy to Cloud"
 mode = "sequential"
 author = "agent"
@@ -97,22 +81,13 @@ task = "shell.exec"
 args = "make client"
 
 [[workflows.workflow]]
-name = "👥 Provision Users"
+name = "✅ Validate NPL"
 mode = "sequential"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "make users"
-
-[[workflows.workflow]]
-name = "🔑 Configure Keycloak"
-mode = "sequential"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "make keycloak"
+args = "make check"
 
 [[workflows.workflow]]
 name = "🏗️ Build Production"
@@ -124,22 +99,13 @@ task = "shell.exec"
 args = "make build"
 
 [[workflows.workflow]]
-name = "✅ Validate NPL"
+name = "👥 Provision Users"
 mode = "sequential"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "make check"
-
-[[workflows.workflow]]
-name = "🧪 Run Tests"
-mode = "sequential"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "make test"
+args = "make users"
 
 [[workflows.workflow]]
 name = "🧹 Clean"
@@ -149,15 +115,6 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "make clean"
-
-[[workflows.workflow]]
-name = "🎨 Install Language Server"
-mode = "sequential"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "make lsp"
 
 [agent]
 expertMode = true
