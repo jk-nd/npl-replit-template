@@ -40,7 +40,8 @@ This document contains everything you need to know about NPL (Noumena Protocol L
 ├── replit.md            # AI Agent workflow instructions
 ├── Makefile             # Setup commands
 ├── docs/
-│   └── NPL_DEVELOPMENT.md   # THIS FILE - NPL reference
+│   ├── NPL_DEVELOPMENT.md         # THIS FILE - NPL reference
+│   └── NPL_FRONTEND_DEVELOPMENT.md # Frontend patterns - parties, claims, @actions
 ├── scripts/
 │   ├── setup-env.sh          # Generate .env from tenant/app
 │   ├── install-npl-cli.sh    # Install NPL CLI
@@ -909,6 +910,16 @@ Content-Type: application/json
 
 - After implementing or updating the frontend, always run `npm run build` to generate the production-ready `dist` directory.
 - Use `make deploy-frontend` or the "🌐 Deploy Frontend" command to deploy to Noumena Cloud.
+
+## Further Reading
+
+**For detailed frontend patterns, see: `docs/NPL_FRONTEND_DEVELOPMENT.md`**
+
+This guide covers:
+- Using `@actions` array to show/hide buttons dynamically
+- Specifying party claims when creating protocol instances
+- API client best practices (useMemo, auth middleware)
+- Common mistakes and how to avoid them
 
 ---
 

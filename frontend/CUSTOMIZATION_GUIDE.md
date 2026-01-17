@@ -2,6 +2,8 @@
 
 This guide helps AI agents adapt this NPL frontend template to different protocol use cases.
 
+> **Prerequisites**: Read `docs/NPL_FRONTEND_DEVELOPMENT.md` first to understand NPL concepts like parties, claims, and the `@actions` array.
+
 ## Current Implementation
 
 This frontend is configured for an **IOU (I Owe You)** protocol with the following entities:

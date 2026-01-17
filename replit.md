@@ -59,15 +59,19 @@ Old protocol definitions can conflict with new ones.
 
 ---
 
-## Read NPL Documentation First
+## Read Documentation First
 
-**Before writing ANY code, you MUST read the NPL development guide:**
+**Before writing ANY code, you MUST read these guides:**
 
-```
-docs/NPL_DEVELOPMENT.md
-```
+| Document | Purpose |
+|----------|---------|
+| `docs/NPL_DEVELOPMENT.md` | NPL syntax, types, methods, and common mistakes |
+| `docs/NPL_FRONTEND_DEVELOPMENT.md` | **How NPL drives frontend patterns** - parties, claims, @actions |
 
-This file contains essential NPL syntax, types, methods, and common mistakes. **Do NOT skip this step.**
+The frontend guide is **critical** - it explains how to:
+- Use `@actions` array to show/hide buttons dynamically
+- Specify party claims when creating protocol instances
+- Handle multi-party authorization via email claims
 
 ---
 
@@ -100,17 +104,21 @@ Before writing code, understand what the user wants to build:
 
 ### Step 3: Build the Frontend
 
-**Only after the backend is deployed:**
+**Only after the backend is deployed. Read `docs/NPL_FRONTEND_DEVELOPMENT.md` first!**
 
 1. **Regenerate the API client**: `make client` (creates types for your new package)
 2. **Update the frontend to use your package**:
    - Update `frontend/src/api/client.ts` - change `demo` to your package name
    - Update `frontend/src/api/types.ts` - import from your generated types
+   - Update party role names to match your protocol (e.g., `buyer`/`seller` instead of `issuer`/`payee`)
    - Update or replace the components in `frontend/src/components/` to match your protocols
-3. **Use the `@actions` array** from API responses to show available actions
-4. **Test with provisioned users**: `make users` creates test accounts (alice, bob, etc.)
+3. **Use the `@actions` array** from API responses to show available actions dynamically
+4. **When creating protocol instances**, always include `@parties` with email claims for ALL party roles
+5. **Test with provisioned users**: `make users` creates test accounts (alice, bob, etc.) with email claims
 
 **⚠️ The existing frontend (`IouCard`, `Dashboard`, etc.) is built for the demo IOU protocol. You MUST update it for your own protocols.**
+
+**⚠️ Party Authorization**: Users are authorized via JWT claims matching party claims. Use `partyFromEmail(email)` helper to create party objects.
 
 ---
 
@@ -118,11 +126,13 @@ Before writing code, understand what the user wants to build:
 
 | File | Purpose |
 |------|---------|
-| `docs/NPL_DEVELOPMENT.md` | **NPL syntax, types, and API reference** (READ THIS FIRST) |
+| `docs/NPL_DEVELOPMENT.md` | **NPL syntax, types, and API reference** (READ FIRST) |
+| `docs/NPL_FRONTEND_DEVELOPMENT.md` | **Frontend patterns** - parties, claims, @actions (READ SECOND) |
 | `npl/src/main/migration.yml` | Deployment configuration |
 | `npl/src/main/npl-1.0/` | NPL protocol source code |
 | `frontend/src/generated/` | Auto-generated TypeScript types from OpenAPI |
 | `frontend/src/api/client.ts` | API client for calling NPL Engine |
+| `frontend/src/api/types.ts` | Party helper functions and type exports |
 
 ---
 
@@ -220,4 +230,7 @@ See `docs/NPL_DEVELOPMENT.md` for MCP configuration details.
 
 ## DO NOT DELETE OR OVERWRITE
 
-**The file `docs/NPL_DEVELOPMENT.md` contains critical NPL documentation. Do not delete, overwrite, or modify it unless explicitly asked to update NPL syntax or examples.**
+**These files contain critical documentation. Do not delete, overwrite, or modify them unless explicitly asked:**
+
+- `docs/NPL_DEVELOPMENT.md` - NPL syntax and backend development
+- `docs/NPL_FRONTEND_DEVELOPMENT.md` - Frontend patterns and party authorization
