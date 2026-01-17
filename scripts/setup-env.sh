@@ -1,21 +1,40 @@
 #!/bin/bash
 # Generate environment configuration from tenant and app name
 # This script derives all URLs from NPL_TENANT and NPL_APP
+#
+# Configuration sources (in priority order):
+# 1. noumena.config file (recommended - committed to repo)
+# 2. Environment variables / Replit Secrets
 
 set -e
 
 echo "🔧 Setting up Noumena Cloud environment..."
 
-# Check required environment variables
+# Try to load from noumena.config first
+if [ -f "noumena.config" ]; then
+    echo "📁 Found noumena.config file"
+    # Source the config file (it uses shell variable syntax)
+    source noumena.config
+fi
+
+# Check if we have the required values
 if [ -z "$NPL_TENANT" ]; then
-    echo "❌ Error: NPL_TENANT environment variable not set"
-    echo "   Add it in Replit's Secrets tab (e.g., 'tim')"
+    echo ""
+    echo "❌ Error: NPL_TENANT not configured"
+    echo ""
+    echo "   Option 1 (Recommended): Edit noumena.config file"
+    echo "   Option 2: Add NPL_TENANT in Replit's Secrets tab"
+    echo ""
     exit 1
 fi
 
 if [ -z "$NPL_APP" ]; then
-    echo "❌ Error: NPL_APP environment variable not set"
-    echo "   Add it in Replit's Secrets tab (e.g., 'test')"
+    echo ""
+    echo "❌ Error: NPL_APP not configured"
+    echo ""
+    echo "   Option 1 (Recommended): Edit noumena.config file"
+    echo "   Option 2: Add NPL_APP in Replit's Secrets tab"
+    echo ""
     exit 1
 fi
 

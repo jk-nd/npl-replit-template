@@ -14,10 +14,28 @@
 6. **Do NOT modify this file**: This file contains agent instructions
 
 ### First-Time Setup
+
+**Step 1: Configure your Noumena Cloud app**
+
+Edit `noumena.config` with your tenant and app name:
+```
+NPL_TENANT=your-tenant
+NPL_APP=your-app
+```
+
+This file is committed to the repo, so when you copy/fork a project, the config comes with it!
+
+**Step 2: Add secrets (only if using Keycloak admin features)**
+
+In Replit Secrets tab, add:
+- `KEYCLOAK_ADMIN_USER` - Only needed for `make users` or `make keycloak`
+- `KEYCLOAK_ADMIN_PASSWORD`
+
+**Step 3: Run setup**
 ```bash
 make setup
 ```
-This interactive command handles everything. A browser will open for login - the user must complete authentication.
+A browser will open for login - the user must complete authentication.
 
 ---
 
