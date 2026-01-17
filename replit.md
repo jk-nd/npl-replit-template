@@ -1,41 +1,53 @@
 # NPL + React Replit Template
 
-## ⚠️ CRITICAL: Agent Instructions
+## 🛑 STOP - READ THIS FIRST
 
-1. **Run `make setup` first**: This is the first thing to do. It will:
-   - Install NPL CLI, language server, and npm dependencies
-   - Open a browser for Noumena Cloud login (user must authenticate)
-   - Deploy NPL backend and generate API client
-   - Prompt for optional Keycloak and test user configuration
-2. **Read NPL docs**: `docs/NPL_DEVELOPMENT.md` contains all NPL syntax and rules
-3. **Delete the demo package**: After building your own NPL code, delete `npl/src/main/npl-1.0/demo/`
-4. **Clean before deploy**: Run `make clean` before deploying to ensure fresh build
-5. **Update the app title**: Change `frontend/index.html` title from "NPL + React" to your app name
-6. **Do NOT modify this file**: This file contains agent instructions
+**DO NOT run npm commands directly. DO NOT start the dev server yet.**
 
-### First-Time Setup
+This project requires setup before it can run. The setup process:
+1. Configures connection to Noumena Cloud
+2. Opens a browser for authentication (user must log in)
+3. Deploys the backend
+4. Generates TypeScript types
 
-**Step 1: Configure your Noumena Cloud app**
+---
 
-Edit `noumena.config` with your tenant and app name:
+## MANDATORY FIRST STEPS
+
+**Before doing ANYTHING else, complete these steps in order:**
+
+### Step 1: Edit `noumena.config`
 ```
-NPL_TENANT=your-tenant
-NPL_APP=your-app
+NPL_TENANT=your-tenant-name
+NPL_APP=your-app-name
 ```
+Ask the user for these values if you don't know them.
 
-This file is committed to the repo, so when you copy/fork a project, the config comes with it!
+### Step 2: Add Keycloak Secrets (in Replit Secrets tab)
+```
+KEYCLOAK_ADMIN_USER=admin-username
+KEYCLOAK_ADMIN_PASSWORD=admin-password
+```
+These are needed for `make users` and `make keycloak` commands.
 
-**Step 2: Add secrets (only if using Keycloak admin features)**
-
-In Replit Secrets tab, add:
-- `KEYCLOAK_ADMIN_USER` - Only needed for `make users` or `make keycloak`
-- `KEYCLOAK_ADMIN_PASSWORD`
-
-**Step 3: Run setup**
+### Step 3: Run setup
 ```bash
 make setup
 ```
-A browser will open for login - the user must complete authentication.
+This will open a browser for Noumena Cloud login - the user must authenticate.
+
+**⚠️ The frontend WILL NOT WORK without completing all three steps.**
+
+---
+
+## After Setup Completes
+
+Only after `make setup` succeeds:
+
+1. **Read NPL docs**: `docs/NPL_DEVELOPMENT.md` contains all NPL syntax and rules
+2. **Delete the demo package**: After building your own NPL code, delete `npl/src/main/npl-1.0/demo/`
+3. **Use `make deploy-npl-clean`**: When changing protocols (clears cache first)
+4. **Run `make client`**: After any NPL changes to regenerate TypeScript types
 
 ---
 
