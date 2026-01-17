@@ -37,28 +37,7 @@ externalPort = 80
 run = ["sh", "-c", "cd frontend && npm run build && npm run preview"]
 
 [workflows]
-runButton = "Project"
-
-[[workflows.workflow]]
-name = "Project"
-mode = "parallel"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Start Dev Server"
-
-[[workflows.workflow]]
-name = "Start Dev Server"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd frontend && npm run dev -- --port 5000 --host 0.0.0.0"
-waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "webview"
+runButton = "🚀 Full Setup"
 
 [[workflows.workflow]]
 name = "🚀 Full Setup"
@@ -68,6 +47,18 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "make setup"
+
+[[workflows.workflow]]
+name = "▶️ Start Dev Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "make run"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
 
 [[workflows.workflow]]
 name = "⚙️ Generate Environment"
