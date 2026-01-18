@@ -6,7 +6,10 @@ set -e
 echo "🌐 Deploying frontend to Noumena Cloud..."
 echo ""
 
-# Source .env if it exists
+# Source configuration files
+if [ -f noumena.config ]; then
+    source noumena.config
+fi
 if [ -f .env ]; then
     export $(grep -v '^#' .env | xargs)
 fi

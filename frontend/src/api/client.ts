@@ -7,7 +7,9 @@ export interface ApiClientConfig {
 }
 
 export function createApiClient(config: ApiClientConfig) {
-  const baseUrl = config.engineUrl ? `${config.engineUrl}/npl/demo` : '/npl/demo'
+  // Note: Don't append /npl/{package} here - the generated OpenAPI paths already include it
+  // e.g., paths include '/npl/demo/Iou/' not just '/Iou/'
+  const baseUrl = config.engineUrl || ''
   
   const client = createClient<paths>({
     baseUrl,

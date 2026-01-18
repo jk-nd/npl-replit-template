@@ -14,7 +14,10 @@ fi
 APP_URL="$1"
 APP_URL="${APP_URL%/}"
 
-# Source .env if it exists
+# Source configuration files
+if [ -f noumena.config ]; then
+    source noumena.config
+fi
 if [ -f .env ]; then
     export $(grep -v '^#' .env | xargs)
 fi

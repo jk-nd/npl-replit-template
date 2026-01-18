@@ -342,8 +342,10 @@ These components are protocol-agnostic and can be reused as-is:
 
 - ✅ `src/components/auth/` - All authentication components
 - ✅ `src/components/shared/LoadingState.tsx` - Loading spinner
-- ✅ `src/api/client.ts` - OpenAPI fetch client
+- ✅ `src/api/client.ts` - OpenAPI fetch client (uses engine URL only; generated paths include `/npl/{package}`)
 - ✅ `src/App.tsx` - Main app routing
+
+**Important:** When switching to your own package, you only need to update the **import path** in `client.ts` (e.g., `from '../generated/demo/api-types'` → `from '../generated/mypackage/api-types'`). Do NOT append `/npl/{package}` to the base URL - the generated OpenAPI paths already include it.
 
 ## Step-by-Step Customization Process
 

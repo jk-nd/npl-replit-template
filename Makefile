@@ -1,7 +1,7 @@
 # NPL + React Replit Template Makefile
 # Alternative to workflow buttons for those who prefer make
 
-.PHONY: help setup setup-quick env install check-setup deploy deploy-npl deploy-npl-clean deploy-frontend client users keycloak add-redirect run build clean login preflight lsp
+.PHONY: help setup setup-quick env install check-setup deploy deploy-npl deploy-npl-clean deploy-frontend client users keycloak add-redirect run build clean login preflight lsp bootstrap
 
 # Default target
 help:
@@ -32,7 +32,8 @@ help:
 	@echo "  login      - Login to Noumena Cloud"
 	@echo "  preflight  - Run pre-flight checks"
 	@echo "  add-redirect URL=<url> - Add custom redirect URI for external hosting"
-	@echo "  lsp        - Install NPL Language Server (syntax highlighting)"
+	@echo "  lsp        - Install NPL Language Server"
+	@echo "  bootstrap  - Create initial protocol instances (customize scripts/bootstrap.sh first)"
 	@echo ""
 	@echo "Configuration (edit noumena.config file):"
 	@echo "  NPL_TENANT          - Your Noumena Cloud tenant"
@@ -61,11 +62,11 @@ setup: env install lsp
 	@echo ""
 	@echo "📋 Optional configuration steps:"
 	@echo ""
-	@read -p "🔑 Configure Keycloak for Replit? (enables dev mode login) [y/N]: " keycloak_choice; \
-	if [ "$$keycloak_choice" = "y" ] || [ "$$keycloak_choice" = "Y" ]; then \
-		$(MAKE) keycloak; \
+	@read -p "🔑 Configure Keycloak for Replit? (REQUIRED for Replit) [Y/n]: " keycloak_choice; \
+	if [ "$$keycloak_choice" = "n" ] || [ "$$keycloak_choice" = "N" ]; then \
+		echo "   ⚠️  Skipped. Run 'make keycloak' if login fails!"; \
 	else \
-		echo "   Skipped. Run 'make keycloak' later if needed."; \
+		$(MAKE) keycloak; \
 	fi
 	@echo ""
 	@read -p "👥 Provision test users (alice, bob, etc.)? [y/N]: " users_choice; \
@@ -189,3 +190,7 @@ login:
 # Run pre-flight checks
 preflight:
 	@./scripts/preflight-check.sh
+
+# Bootstrap initial data (customize scripts/bootstrap.sh first)
+bootstrap: check-setup
+	@./scripts/bootstrap.sh

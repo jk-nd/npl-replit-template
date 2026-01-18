@@ -250,7 +250,8 @@ if (instance["@actions"].includes("approve")) {
 | `make users` | Create test users (alice, bob, etc.) |
 | `make keycloak` | Configure Keycloak for Replit (enables dev mode) |
 | `make add-redirect URL=<url>` | Add redirect URI for external hosting |
-| `make lsp` | Install NPL Language Server (syntax highlighting) |
+| `make lsp` | Install NPL Language Server |
+| `make bootstrap` | Create initial protocol instances (customize `scripts/bootstrap.sh` first) |
 | `make run` | Start frontend dev server |
 
 ---

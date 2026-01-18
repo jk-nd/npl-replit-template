@@ -83,6 +83,30 @@ export function partyFromEmail(email: string): Party {
 
 When creating a protocol instance, you must provide claims for **every party role** defined in the protocol.
 
+### ⚠️ Important: Party Claims JSON Format
+
+The `@parties` object uses **`claims`** (not `entity` or other field names):
+
+```json
+{
+  "@parties": {
+    "issuer": {
+      "claims": {
+        "email": ["alice@example.com"]
+      }
+    },
+    "payee": {
+      "claims": {
+        "email": ["bob@example.com"]
+      }
+    }
+  },
+  "forAmount": 100
+}
+```
+
+**Common mistake**: Using `"entity"` instead of `"claims"` - this will cause API errors.
+
 ### Example: Two-Party Protocol
 
 ```npl
