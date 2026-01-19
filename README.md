@@ -29,18 +29,31 @@ If this is published as a Replit template, simply click **Use Template**.
 
 ## 🚀 Quick Start
 
-### 1. Configure Secrets
+### 1. Configure Your Project
 
-In Replit's **Secrets** tab (🔒), add only **two required secrets**:
+Edit the `noumena.config` file in the project root:
 
-| Secret | Description | Example |
-|--------|-------------|---------|
-| `NPL_TENANT` | Your Noumena Cloud tenant | `my-company` |
-| `NPL_APP` | Your Noumena Cloud app | `my-app` |
+```
+NPL_TENANT=my-company
+NPL_APP=my-app
+```
 
-**Find these at:** `portal.noumena.cloud/{tenant}/{app}`
+**Find these values at:** `portal.noumena.cloud/{tenant}/{app}`
 
 All other URLs (NPL Engine, Keycloak) are **automatically derived** from these!
+
+> **Note:** These are not secrets — they're visible in URLs. Alternatively, you can use Replit's **Configurations** tab instead of the config file.
+
+**Add Keycloak Secrets**
+
+To configure Keycloak and create test users, add these in Replit's **Secrets** tab (🔒):
+
+| Secret | Description |
+|--------|-------------|
+| `KEYCLOAK_ADMIN_USER` | Keycloak admin username |
+| `KEYCLOAK_ADMIN_PASSWORD` | Keycloak admin password |
+
+These enable the optional Keycloak configuration steps during setup.
 
 ### 2. Run Full Setup (Interactive)
 
